@@ -9,4 +9,5 @@ const (
 	IsDeleted   = "is_deleted"
 	CreatedTime = "created_time"
 	Id          = "id"
+	MaterialId  = "material_id"
 )
