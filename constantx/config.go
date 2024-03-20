@@ -11,4 +11,5 @@ const (
 	CreatedTime = "created_time"
 	Id          = "id"
 	MaterialId  = "material_id"
+	MediaId     = "media_id"
 )
