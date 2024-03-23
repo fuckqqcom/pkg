@@ -11,6 +11,9 @@ const (
 	OrganizationId = "organization_id"
 	MediaId        = "media_id"
 
+	AppKey    = "app_key"
+	AppSecret = "app_secret"
+
 	OpenStatus      = "open_status"
 	DeletedStatus   = "deleted_status"
 	DraftedStatus   = "drafted_status"
