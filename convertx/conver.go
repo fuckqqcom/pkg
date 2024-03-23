@@ -15,3 +15,7 @@ func AnyToArr[T comparable](arr []T) []any {
 	}
 	return t
 }
+
+func ToBytes(value any) ([]byte, error) {
+	return convertor.ToBytes(value)
+}
