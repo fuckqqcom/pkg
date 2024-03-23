@@ -7,5 +7,5 @@ const (
 	IsNotDrafted   = 1 //已推送
 	IsNotPublished = 1 //已发布
 	IsNotOpen      = 1 //开启
-
+	IsNotAudited   = 1
 )
