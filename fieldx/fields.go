@@ -29,7 +29,7 @@ func CropProtoMessages(objs []proto.Message, includeFields []string, excludeFiel
 		fieldsAttrs := obj.ProtoReflect().Descriptor().Fields()
 		for i := 0; i < fieldsAttrs.Len(); i++ {
 			name := fieldsAttrs.Get(i).TextName()
-			if !convert.ContainIgnoreCase(name, excludeFields) {
+			if !convertx.ContainIgnoreCase(name, excludeFields) {
 				includeFields = append(includeFields, name)
 			}
 		}
@@ -49,7 +49,7 @@ func CropObjFields(obj any, fields []string) {
 	for i := 0; i < elems.NumField(); i++ {
 		field := elems.Field(i)
 		fieldName := typeOfType.Field(i).Name
-		if !convert.ContainIgnoreCase(fieldName, fields) {
+		if !convertx.ContainIgnoreCase(fieldName, fields) {
 			kind(field)
 		}
 	}
@@ -67,5 +67,7 @@ func kind(field reflect.Value) {
 		field.SetFloat(0)
 	case reflect.Bool:
 		field.SetBool(false)
+	default:
+		panic("unhandled default case")
 	}
 }
