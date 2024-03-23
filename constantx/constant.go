@@ -5,9 +5,11 @@ const (
 	Version        = 0
 	IsNotDeleted   = 1  //未删除
 	IsDeleted      = -1 //已删除
-	IsNotDrafted   = 1  //已推送
-	IsNotPublished = 1  //已发布
-	IsOpen         = 1  //开启
+	IsNotDrafted   = 1  //未推送
+	IsNotPublished = -1 //未发布
+	IsPublished    = 1
+	IsOpen         = 1 //开启
 	IsNotOpen      = -1
-	IsNotAudited   = 1
+	IsNotAudited   = -1
+	IsAudited      = 1
 )
