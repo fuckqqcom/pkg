@@ -15,4 +15,13 @@ const (
 	DraftedStatus   = "drafted_status"
 	PublishedStatus = "published_status"
 	CreatedTime     = "created_time"
+
+	// MediaImage 媒体文件:图片
+	MediaImage = "image"
+	// MediaVoice 媒体文件:声音
+	MediaVoice = "voice"
+	// MediaVideo 媒体文件:视频
+	MediaVideo = "video"
+	// MediaThumb 媒体文件:缩略图
+	MediaThumb = "thumb"
 )
