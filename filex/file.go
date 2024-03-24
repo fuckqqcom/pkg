@@ -27,3 +27,11 @@ func Create(file *multipart.FileHeader, dst string) error {
 	_, err = io.Copy(out, src)
 	return err
 }
+
+func RemoveFile(filename string) error {
+	return os.Remove(filename)
+}
+
+func RemovePath(path string) error {
+	return os.RemoveAll(path)
+}
