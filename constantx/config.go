@@ -1,14 +1,18 @@
 package constantx
 
 const (
-	Id         = "id"
-	TenantId   = "tenant_id"
-	AppId      = "app_id"
-	UserId     = "user_id"
-	AccountId  = "account_id"
-	ArticleId  = "article_id"
-	MaterialId = "material_id"
-	MediaId    = "media_id"
+	Id             = "id"
+	TenantId       = "tenant_id"
+	AppId          = "app_id"
+	UserId         = "user_id"
+	AccountId      = "account_id"
+	ArticleId      = "article_id"
+	MaterialId     = "material_id"
+	OrganizationId = "organization_id"
+	MediaId        = "media_id"
+
+	AppKey    = "app_key"
+	AppSecret = "app_secret"
 
 	OpenStatus      = "open_status"
 	DeletedStatus   = "deleted_status"
