@@ -22,7 +22,7 @@ const (
 	PublishedStatus = "published_status"
 	CreatedTime     = "created_time"
 	Code            = "code"
-
+	Phone           = "phone"
 	// MediaImage 媒体文件:图片
 	MediaImage = "image"
 	// MediaVoice 媒体文件:声音
