@@ -10,9 +10,11 @@ const (
 	MaterialId     = "material_id"
 	OrganizationId = "organization_id"
 	MediaId        = "media_id"
-
-	AppKey    = "app_key"
-	AppSecret = "app_secret"
+	FactorId       = "factor_id"
+	FactorConfigId = "factor_config_id"
+	ProviderId     = "provider_id"
+	AppKey         = "app_key"
+	AppSecret      = "app_secret"
 
 	OpenStatus      = "open_status"
 	DeletedStatus   = "deleted_status"
