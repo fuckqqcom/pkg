@@ -19,6 +19,7 @@ const (
 	DraftedStatus   = "drafted_status"
 	PublishedStatus = "published_status"
 	CreatedTime     = "created_time"
+	Code            = "code"
 
 	// MediaImage 媒体文件:图片
 	MediaImage = "image"
