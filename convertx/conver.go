@@ -19,7 +19,13 @@ func AnyToArr[T comparable](arr []T) []any {
 func AnyToStr(value any) string {
 	return convertor.ToString(value)
 }
-
+func ArrToJoinStr(args ...any) string {
+	var s []string
+	for _, arg := range args {
+		s = append(s, convertor.ToString(arg))
+	}
+	return strings.Join(s, "_")
+}
 func ToBytes(value any) ([]byte, error) {
 	return convertor.ToBytes(value)
 }
