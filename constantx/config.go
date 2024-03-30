@@ -10,9 +10,12 @@ const (
 	MaterialId     = "material_id"
 	OrganizationId = "organization_id"
 	MediaId        = "media_id"
-
-	AppKey    = "app_key"
-	AppSecret = "app_secret"
+	FactorId       = "factor_id"
+	FactorConfigId = "factor_config_id"
+	ProviderId     = "provider_id"
+	AccessId       = "access_id"
+	AppKey         = "app_key"
+	AppSecret      = "app_secret"
 
 	OpenStatus      = "open_status"
 	DeletedStatus   = "deleted_status"
@@ -20,7 +23,7 @@ const (
 	PublishedStatus = "published_status"
 	CreatedTime     = "created_time"
 	Code            = "code"
-
+	Phone           = "phone"
 	// MediaImage 媒体文件:图片
 	MediaImage = "image"
 	// MediaVoice 媒体文件:声音
