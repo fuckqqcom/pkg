@@ -29,4 +29,16 @@ const (
 	MediaVideo = "video"
 	// MediaThumb 媒体文件:缩略图
 	MediaThumb = "thumb"
+
+	BaseAccess               = "base"
+	BaseFactorPhone          = "phone"    //手机号码
+	BaseFactorConfigPassword = "password" //密码登录
+	BaseFactorConfigVerify   = "verify"   //验证码
+
+	SocialAccess                          = "social"
+	SocialFactorWechat                    = "wechat"
+	SocialFactorConfigWechatOfficeAccount = "wechat_office_account" //公众号
+	SocialFactorConfigWechatMini          = "wechat_mini"           //小程序
+	SocialFactorConfigWechatPcQrcode      = "wechat_pc_qrcode"      // pc二维码
+	EnterpriseAccess                      = "enterprise"
 )
