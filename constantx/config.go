@@ -24,6 +24,7 @@ const (
 	DeletedStatus   = "deleted_status"
 	DraftedStatus   = "drafted_status"
 	PublishedStatus = "published_status"
+	DefaultStatus   = "default_status"
 	CreatedTime     = "created_time"
 	Code            = "code"
 	Name            = "name"
