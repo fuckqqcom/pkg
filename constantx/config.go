@@ -26,6 +26,7 @@ const (
 	Phone           = "phone"
 	Level           = "level"
 	Title           = "title"
+	Content         = "content"
 	// MediaImage 媒体文件:图片
 	MediaImage = "image"
 	// MediaVoice 媒体文件:声音
