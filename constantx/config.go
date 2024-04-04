@@ -17,8 +17,8 @@ const (
 	PlatformId      = "platform_id"
 	AppKey          = "app_key"
 	AppSecret       = "app_secret"
-	IP              = "ip"
 	SocialAccountId = "social_account_id"
+	IP              = "ip"
 
 	OpenStatus      = "open_status"
 	DeletedStatus   = "deleted_status"
@@ -26,6 +26,7 @@ const (
 	PublishedStatus = "published_status"
 	CreatedTime     = "created_time"
 	Code            = "code"
+	Name            = "name"
 	Phone           = "phone"
 	Level           = "level"
 	Title           = "title"
