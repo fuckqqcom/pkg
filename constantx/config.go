@@ -24,6 +24,7 @@ const (
 	CreatedTime     = "created_time"
 	Code            = "code"
 	Phone           = "phone"
+	Level           = "level"
 	// MediaImage 媒体文件:图片
 	MediaImage = "image"
 	// MediaVoice 媒体文件:声音
