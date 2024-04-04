@@ -14,6 +14,7 @@ const (
 	FactorConfigId = "factor_config_id"
 	ProviderId     = "provider_id"
 	AccessId       = "access_id"
+	PlatformId     = "platform_id"
 	AppKey         = "app_key"
 	AppSecret      = "app_secret"
 
