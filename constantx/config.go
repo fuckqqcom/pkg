@@ -17,6 +17,7 @@ const (
 	PlatformId     = "platform_id"
 	AppKey         = "app_key"
 	AppSecret      = "app_secret"
+	IP             = "ip"
 
 	OpenStatus      = "open_status"
 	DeletedStatus   = "deleted_status"
