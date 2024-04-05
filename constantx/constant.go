@@ -15,4 +15,7 @@ const (
 
 	IsPrivate    = -1
 	IsNotPrivate = 1
+
+	IsNotRetrieved = -1
+	IsRetrieved    = 1
 )
