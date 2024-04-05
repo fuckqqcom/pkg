@@ -26,6 +26,7 @@ const (
 	PublishedStatus = "published_status"
 	DefaultStatus   = "default_status"
 	PrivateStatus   = "private_status"
+	RetrievedStatus = "retrieved_status"
 	CreatedTime     = "created_time"
 	Code            = "code"
 	Name            = "name"
