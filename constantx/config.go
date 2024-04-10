@@ -15,6 +15,7 @@ const (
 	ProviderId      = "provider_id"
 	AccessId        = "access_id"
 	PlatformId      = "platform_id"
+	ArticleKindId   = "article_kind_id"
 	AppKey          = "app_key"
 	AppSecret       = "app_secret"
 	SocialAccountId = "social_account_id"
