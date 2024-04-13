@@ -17,7 +17,7 @@ const (
 	PlatformId      = "platform_id"
 	ArticleKindId   = "article_kind_id"
 	LanguageModelId = "language_model_id"
-
+	Account         = "account"
 	AppKey          = "app_key"
 	AppSecret       = "app_secret"
 	SocialAccountId = "social_account_id"
