@@ -3,9 +3,11 @@ module github.com/fuckqqcom/pkg
 go 1.21.3
 
 require (
+	github.com/antlabs/strsim v0.0.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/duke-git/lancet/v2 v2.3.0
 	github.com/zeromicro/go-zero v1.6.3
+	golang.org/x/crypto v0.19.0
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
 )
