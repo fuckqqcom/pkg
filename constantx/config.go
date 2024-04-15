@@ -46,8 +46,11 @@ const (
 	// MediaThumb 媒体文件:缩略图
 	MediaThumb = "thumb"
 
-	BasePortal             = "base"
-	BaseFactorPhone        = "phone"    //手机号码
+	BasePortal        = "base"
+	BaseFactorPhone   = "phone"   //手机号码
+	BaseFactorEmail   = "email"   //邮箱
+	BaseFactorAccount = "account" //账号
+
 	BaseFactorKindPassword = "password" //密码登录
 	BaseFactorKindVerify   = "verify"   //验证码
 
