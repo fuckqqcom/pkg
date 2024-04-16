@@ -24,4 +24,6 @@ const (
 
 	IsSuperuser    = 1
 	IsNotSuperuser = -1
+	IsStaff        = 1
+	IsNotStaff     = 1
 )
