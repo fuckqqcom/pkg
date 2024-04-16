@@ -34,6 +34,7 @@ const (
 	Code            = "code"
 	Name            = "name"
 	Phone           = "phone"
+	Email           = "email"
 	Level           = "level"
 	Title           = "title"
 	Content         = "content"
