@@ -21,4 +21,7 @@ const (
 
 	IsNotRetrieved = -1
 	IsRetrieved    = 1
+
+	IsSuperuser    = 1
+	IsNotSuperuser = -1
 )
