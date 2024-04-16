@@ -29,4 +29,5 @@ const (
 
 	AppSecretLen = 20
 	AppKeyLen    = 12
+	SaltLen      = 8
 )
