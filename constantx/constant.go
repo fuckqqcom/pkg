@@ -15,6 +15,8 @@ const (
 	IsNotOpen      = -1
 	IsNotAudited   = -1
 	IsAudited      = 1
+	IsShow         = 1
+	IsNotShow      = -1
 
 	IsPrivate    = -1
 	IsNotPrivate = 1
