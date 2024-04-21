@@ -11,11 +11,13 @@ const (
 	OrganizationId  = "organization_id"
 	MediaId         = "media_id"
 	FactorId        = "factor_id"
-	FactorConfigId  = "factor_config_id"
+	FactorKindId    = "factor_config_id"
 	ProviderId      = "provider_id"
 	AccessId        = "access_id"
 	PlatformId      = "platform_id"
 	ArticleKindId   = "article_kind_id"
+	LanguageModelId = "language_model_id"
+	Account         = "account"
 	AppKey          = "app_key"
 	AppSecret       = "app_secret"
 	SocialAccountId = "social_account_id"
@@ -32,6 +34,7 @@ const (
 	Code            = "code"
 	Name            = "name"
 	Phone           = "phone"
+	Email           = "email"
 	Level           = "level"
 	Title           = "title"
 	Content         = "content"
@@ -44,15 +47,18 @@ const (
 	// MediaThumb 媒体文件:缩略图
 	MediaThumb = "thumb"
 
-	BaseAccess               = "base"
-	BaseFactorPhone          = "phone"    //手机号码
-	BaseFactorConfigPassword = "password" //密码登录
-	BaseFactorConfigVerify   = "verify"   //验证码
+	BasePortal        = "base"
+	BaseFactorPhone   = "phone"   //手机号码
+	BaseFactorEmail   = "email"   //邮箱
+	BaseFactorAccount = "account" //账号
 
-	SocialAccess                          = "social"
-	SocialFactorWechat                    = "wechat"
-	SocialFactorConfigWechatOfficeAccount = "wechat_office_account" //公众号
-	SocialFactorConfigWechatMini          = "wechat_mini"           //小程序
-	SocialFactorConfigWechatPcQrcode      = "wechat_pc_qrcode"      // pc二维码
-	EnterpriseAccess                      = "enterprise"
+	BaseFactorKindPassword = "password" //密码登录
+	BaseFactorKindVerify   = "verify"   //验证码
+
+	SocialPortal                        = "social"
+	SocialFactorWechat                  = "wechat"
+	SocialFactorKindWechatOfficeAccount = "wechat_office_account" //公众号
+	SocialFactorKindWechatMini          = "wechat_mini"           //小程序
+	SocialFactorKindWechatPcQrcode      = "wechat_pc_qrcode"      // pc二维码
+	EnterprisePortal                    = "enterprise"
 )

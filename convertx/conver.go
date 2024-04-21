@@ -2,8 +2,22 @@ package convertx
 
 import (
 	"github.com/duke-git/lancet/v2/convertor"
+	"math/rand"
 	"strings"
+	"time"
 )
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func GenerateStr(length int) string {
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
+}
 
 func AnyToInt64(value any) (int64, error) {
 	return convertor.ToInt(value)
