@@ -7,11 +7,11 @@ import (
 	"reflect"
 )
 
-func CropProtoFields(obj proto.Message, includeFields []string, excludeFields []string) map[string]interface{} {
+func CropProtoFields(obj proto.Message, includeFields []string, excludeFields []string, merge bool) map[string]interface{} {
 	fieldsAttrs := obj.ProtoReflect().Descriptor().Fields()
 	for i := 0; i < fieldsAttrs.Len(); i++ {
 		name := fieldsAttrs.Get(i).TextName()
-		if !convertx.ContainIgnoreCase(name, excludeFields) {
+		if merge && !convertx.ContainIgnoreCase(name, excludeFields) {
 			includeFields = append(includeFields, name)
 		}
 	}
