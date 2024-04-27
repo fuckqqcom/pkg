@@ -22,7 +22,7 @@ const (
 	AppSecret       = "app_secret"
 	SocialAccountId = "social_account_id"
 	IP              = "ip"
-
+	UserInfo        = "userinfo"
 	OpenStatus      = "open_status"
 	DeletedStatus   = "deleted_status"
 	DraftedStatus   = "drafted_status"
@@ -30,6 +30,7 @@ const (
 	DefaultStatus   = "default_status"
 	PrivateStatus   = "private_status"
 	RetrievedStatus = "retrieved_status"
+	ShowStatus      = "show_status"
 	CreatedTime     = "created_time"
 	Code            = "code"
 	Name            = "name"
