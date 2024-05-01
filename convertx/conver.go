@@ -64,7 +64,7 @@ func Contains[T comparable](target T, arr []T) bool {
 	return false
 }
 
-func MapValues[T comparable](m map[T]T) (val []any) {
+func MapVal[T comparable](m map[T]T) (val []any) {
 	for _, v := range val {
 		val = append(val, v)
 	}
