@@ -64,7 +64,7 @@ func Contains[T comparable](target T, arr []T) bool {
 	return false
 }
 
-func MapErrs[T comparable](m map[T]error) (errs []any) {
+func MapErrs[T comparable](m map[T]error) (errs []error) {
 	for _, v := range errs {
 		errs = append(errs, v)
 	}
