@@ -17,6 +17,7 @@ func GetNonce() (string, error) {
 	}
 	return node.Generate().Base64(), nil
 }
+
 func GetIdArr(n int) (arr []int64, err error) {
 	node, err := snowflake.NewNode(1)
 	if err != nil {
