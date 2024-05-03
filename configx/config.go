@@ -7,10 +7,7 @@ import (
 )
 
 type Config struct {
-	Mysql struct {
-		Read  sqlx.SqlConn
-		Write sqlx.SqlConn
-	}
+	Conn  sqlx.SqlConn
 	Cache cache.CacheConf //redis缓存
 	Redis redis.Redis
 	Opts  cache.Option
