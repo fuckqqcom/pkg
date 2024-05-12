@@ -48,18 +48,18 @@ const (
 	// MediaThumb 媒体文件:缩略图
 	MediaThumb = "thumb"
 
-	BasePortal        = "base"
-	BaseFactorPhone   = "phone"   //手机号码
-	BaseFactorEmail   = "email"   //邮箱
-	BaseFactorAccount = "account" //账号
+	BaseLoginMethod     = "base"
+	BaseProviderPhone   = "phone"   //手机号码
+	BaseProviderEmail   = "email"   //邮箱
+	BaseProviderAccount = "account" //账号
 
-	BaseFactorKindPassword = "password" //密码登录
-	BaseFactorKindVerify   = "verify"   //验证码
+	BaseIdentityProviderPassword = "password" //密码登录
+	BaseIdentityProviderVerify   = "verify"   //验证码
 
-	SocialPortal                        = "social"
-	SocialFactorWechat                  = "wechat"
-	SocialFactorKindWechatOfficeAccount = "wechat_office_account" //公众号
-	SocialFactorKindWechatMini          = "wechat_mini"           //小程序
-	SocialFactorKindWechatPcQrcode      = "wechat_pc_qrcode"      // pc二维码
-	EnterprisePortal                    = "enterprise"
+	SocialLoginMethod                         = "social"
+	SocialProviderWechat                      = "wechat"
+	SocialIdentityProviderWechatOfficeAccount = "wechat_office_account" //公众号
+	SocialIdentityProviderWechatMini          = "wechat_mini"           //小程序
+	SocialIdentityProviderWechatPcQrcode      = "wechat_pc_qrcode"      // pc二维码
+	EnterpriseLoginMethod                     = "enterprise"
 )
