@@ -5,5 +5,5 @@ type UserInfo struct {
 	TenantId int64 `json:"tenant_id"`
 	AppId    int64 `json:"app_id"`
 	//OrganizationId int64 `json:"organization_id"`
-	IsSuperuser bool `json:"is_superuser"`
+	SuperuserStatus int64 `json:"superuser_status"`
 }
