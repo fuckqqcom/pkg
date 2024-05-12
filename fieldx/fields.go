@@ -13,9 +13,13 @@ func CropProtoFields(obj proto.Message, includeFields []string, excludeFields []
 		name := fieldsAttrs.Get(i).TextName()
 		if merge && !convertx.ContainIgnoreCase(name, excludeFields) {
 			includeFields = append(includeFields, name)
-		} else if includeFields == nil {
-			includeFields = append(includeFields, name)
 		}
+
+		//if merge && !convertx.ContainIgnoreCase(name, excludeFields) {
+		//	includeFields = append(includeFields, name)
+		//} else if includeFields == nil {
+		//	includeFields = append(includeFields, name)
+		//}
 	}
 	data := make(map[string]interface{}, len(includeFields))
 	for _, field := range includeFields {
