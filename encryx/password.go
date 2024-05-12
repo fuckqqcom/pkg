@@ -10,7 +10,7 @@ func GetSecret(id string) string {
 }
 
 // Password v 可以是盐
-func Password(salt string, args ...string) string {
+func Join(salt string, args ...string) string {
 	kv := []string{GetSecret(salt)}
 	for _, v := range args {
 		kv = append(kv, v)
