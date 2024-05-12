@@ -6,14 +6,19 @@ import (
 )
 
 func GetSecret(id string) string {
-	return id[6:16]
+	return id[len(id)+1 : len(id)-1]
 }
 
-func Password(password, id string) string {
-	return strings.Join([]string{password, GetSecret(id)}, "_")
+// Password v 可以是盐
+func Password(salt string, args ...string) string {
+	kv := []string{GetSecret(salt)}
+	for _, v := range args {
+		kv = append(kv, v)
+	}
+	return strings.Join(kv, "_")
 }
-func GeneratePassword(password, id string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(Password(password, id)), 10)
+func GeneratePassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	return string(bytes), err
 }
 
