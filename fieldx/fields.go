@@ -11,7 +11,9 @@ func CropProtoFields(obj proto.Message, includeFields []string, excludeFields []
 	fieldsAttrs := obj.ProtoReflect().Descriptor().Fields()
 	for i := 0; i < fieldsAttrs.Len(); i++ {
 		name := fieldsAttrs.Get(i).TextName()
-		if merge || includeFields == nil {
+		if merge && !convertx.ContainIgnoreCase(name, excludeFields) {
+			includeFields = append(includeFields, name)
+		} else if includeFields == nil {
 			includeFields = append(includeFields, name)
 		}
 	}
