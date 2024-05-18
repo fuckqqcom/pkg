@@ -9,4 +9,5 @@ type UserInfo struct {
 type TokenInfo struct {
 	Id    int64  `json:"id"`
 	Token string `json:"token"`
+	Salt  string `json:"salt"`
 }
