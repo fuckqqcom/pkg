@@ -7,6 +7,6 @@ type UserInfo struct {
 }
 
 type TokenInfo struct {
-	Id   int64  `json:"id"`
-	Data string `json:"data"`
+	Id    int64  `json:"id"`
+	Token string `json:"token"`
 }
