@@ -29,7 +29,7 @@ func ParseJwt(token, secret string) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	if claims.Valid {
+	if !claims.Valid {
 		return nil, errors.New("token is valid")
 	}
 	return payload, nil
