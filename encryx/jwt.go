@@ -3,7 +3,6 @@ package encryx
 import (
 	"errors"
 	"fmt"
-	"github.com/fuckqqcom/pkg/constantx"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -21,17 +20,17 @@ func GenerateJwt(secret string, payloads map[string]any, seconds int64) (string,
 	return token.SignedString([]byte(secret))
 }
 
-func ParseJwt(token, secret string) (userId any, err error) {
+func ParseJwt(token, secret string) (map[string]any, error) {
 	payload := jwt.MapClaims{}
 	claims, err := jwt.ParseWithClaims(token, payload, func(token *jwt.Token) (interface{}, error) {
 		fmt.Println(token.Header)
 		return []byte(secret), nil
 	})
 	if err != nil {
-		return
+		return nil, err
 	}
 	if claims.Valid {
 		return nil, errors.New("token is valid")
 	}
-	return payload[constantx.UserId], nil
+	return payload, nil
 }
