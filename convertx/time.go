@@ -24,6 +24,7 @@ func CompareNow(t time.Time) bool {
 	return now.After(t)
 }
 func CompareInt(start int64) bool {
+	// now 大于 起始 返回True
 	now := time.Now().In(loc).Unix()
 	return now > start
 }
