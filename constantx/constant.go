@@ -26,8 +26,10 @@ const (
 
 	IsSuperuser    = 1
 	IsNotSuperuser = -1
-	IsStaff        = 1
-	IsNotStaff     = 1
+	IsStaff        = 2
+	IsSuperStaff   = 1
+
+	IsNotStaff = 1
 
 	AppSecretLen = 20
 	AppKeyLen    = 12
