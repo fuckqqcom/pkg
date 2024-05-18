@@ -6,7 +6,10 @@ import (
 )
 
 func GetSecret(id string) string {
-	return id[len(id)+1 : len(id)-1]
+	if len(id) < 4 {
+		return id
+	}
+	return id[int64(len(id)/10)+1 : len(id)-1]
 }
 
 // Join salt 可以是盐
