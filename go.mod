@@ -6,8 +6,9 @@ require (
 	github.com/antlabs/strsim v0.0.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/duke-git/lancet/v2 v2.3.0
-	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/huandu/go-sqlbuilder v1.30.0
+	github.com/spf13/cast v1.7.0
 	github.com/zeromicro/go-zero v1.6.3
 	golang.org/x/crypto v0.19.0
 	google.golang.org/grpc v1.62.1
@@ -25,6 +26,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0 // indirect
+	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
