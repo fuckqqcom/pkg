@@ -44,7 +44,7 @@ type Rule struct {
 	Val any
 }
 
-func New(rules []Rule) []Rule {
+func New(rules ...Rule) []Rule {
 	return rules
 }
 
