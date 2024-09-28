@@ -36,7 +36,7 @@ const (
 	OrderBy          Op = "ORDER BY"
 )
 
-type rule struct {
+type Rule struct {
 	Skip bool
 
 	Key string
@@ -44,11 +44,11 @@ type rule struct {
 	Val any
 }
 
-func New(condos ...rule) []rule {
-	return condos
+func New(rules ...Rule) []Rule {
+	return rules
 }
 
-func Select(builder sqlbuilder.SelectBuilder, rules ...rule) sqlbuilder.SelectBuilder {
+func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
 	for _, rule := range rules {
 		if rule.Skip {
 			continue
@@ -96,7 +96,7 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...rule) sqlbuilder.SelectBu
 	return builder
 }
 
-func Update(builder sqlbuilder.UpdateBuilder, rules ...rule) sqlbuilder.UpdateBuilder {
+func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
 	for _, rule := range rules {
 		if rule.Skip {
 			continue
@@ -142,7 +142,7 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...rule) sqlbuilder.UpdateBu
 	return builder
 }
 
-func Delete(builder sqlbuilder.DeleteBuilder, rules ...rule) sqlbuilder.DeleteBuilder {
+func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
 	for _, rule := range rules {
 		if rule.Skip {
 			continue
