@@ -1,4 +1,4 @@
-package condition
+package rule
 
 import (
 	"github.com/fuckqqcom/pkg/convertx"
@@ -36,7 +36,7 @@ const (
 	OrderBy          Op = "ORDER BY"
 )
 
-type Condition struct {
+type rule struct {
 	Skip bool
 
 	Key string
@@ -44,144 +44,144 @@ type Condition struct {
 	Val any
 }
 
-func New(conditions ...Condition) []Condition {
-	return conditions
+func New(condos ...rule) []rule {
+	return condos
 }
 
-func Select(builder sqlbuilder.SelectBuilder, conditions ...Condition) sqlbuilder.SelectBuilder {
-	for _, cond := range conditions {
-		if cond.Skip {
+func Select(builder sqlbuilder.SelectBuilder, rules ...rule) sqlbuilder.SelectBuilder {
+	for _, rule := range rules {
+		if rule.Skip {
 			continue
 		}
-		switch Op(strings.ToUpper(string(cond.Op))) {
+		switch Op(strings.ToUpper(string(rule.Op))) {
 		case E:
-			builder.Where(builder.Equal(cond.Key, cond.Val))
+			builder.Where(builder.Equal(rule.Key, rule.Val))
 		case NE:
-			builder.Where(builder.NotEqual(cond.Key, cond.Val))
+			builder.Where(builder.NotEqual(rule.Key, rule.Val))
 		case GT:
-			builder.Where(builder.GreaterThan(cond.Key, cond.Val))
+			builder.Where(builder.GreaterThan(rule.Key, rule.Val))
 		case LT:
-			builder.Where(builder.LessThan(cond.Key, cond.Val))
+			builder.Where(builder.LessThan(rule.Key, rule.Val))
 		case GTE:
-			builder.Where(builder.GreaterEqualThan(cond.Key, cond.Val))
+			builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
 		case LTE:
-			builder.Where(builder.LessEqualThan(cond.Key, cond.Val))
+			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
 		case In:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.Where(builder.In(cond.Key, convertx.ReflectSlice(cond.Val)...))
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.In(rule.Key, convertx.ReflectSlice(rule.Val)...))
 			}
 		case NotIn:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.Where(builder.NotIn(cond.Key, convertx.ReflectSlice(cond.Val)...))
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.NotIn(rule.Key, convertx.ReflectSlice(rule.Val)...))
 			}
 		case Like:
-			builder.Where(builder.Like(cond.Key, cond.Val))
+			builder.Where(builder.Like(rule.Key, rule.Val))
 		case NotLike:
-			builder.Where(builder.NotLike(cond.Key, cond.Val))
+			builder.Where(builder.NotLike(rule.Key, rule.Val))
 		case Limit:
-			builder.Limit(cast.ToInt(cond.Val))
+			builder.Limit(cast.ToInt(rule.Val))
 		case Offset:
-			builder.Offset(cast.ToInt(cond.Val))
+			builder.Offset(cast.ToInt(rule.Val))
 		case Between:
-			value := convertx.ReflectSlice(cond.Val)
+			value := convertx.ReflectSlice(rule.Val)
 			if len(value) == 2 {
-				builder.Where(builder.Between(cond.Key, value[0], value[1]))
+				builder.Where(builder.Between(rule.Key, value[0], value[1]))
 			}
 		case OrderBy:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(cond.Val))...)
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(rule.Val))...)
 			}
 		}
 	}
 	return builder
 }
 
-func Update(builder sqlbuilder.UpdateBuilder, conditions ...Condition) sqlbuilder.UpdateBuilder {
-	for _, cond := range conditions {
-		if cond.Skip {
+func Update(builder sqlbuilder.UpdateBuilder, rules ...rule) sqlbuilder.UpdateBuilder {
+	for _, rule := range rules {
+		if rule.Skip {
 			continue
 		}
-		switch Op(strings.ToUpper(string(cond.Op))) {
+		switch Op(strings.ToUpper(string(rule.Op))) {
 		case E:
-			builder.Where(builder.Equal(cond.Key, cond.Val))
+			builder.Where(builder.Equal(rule.Key, rule.Val))
 		case NE:
-			builder.Where(builder.NotEqual(cond.Key, cond.Val))
+			builder.Where(builder.NotEqual(rule.Key, rule.Val))
 		case GT:
-			builder.Where(builder.GreaterThan(cond.Key, cond.Val))
+			builder.Where(builder.GreaterThan(rule.Key, rule.Val))
 		case LT:
-			builder.Where(builder.LessThan(cond.Key, cond.Val))
+			builder.Where(builder.LessThan(rule.Key, rule.Val))
 		case GTE:
-			builder.Where(builder.GreaterEqualThan(cond.Key, cond.Val))
+			builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
 		case LTE:
-			builder.Where(builder.LessEqualThan(cond.Key, cond.Val))
+			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
 		case In:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.Where(builder.In(cond.Key, convertx.ReflectSlice(cond.Val)...))
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.In(rule.Key, convertx.ReflectSlice(rule.Val)...))
 			}
 		case NotIn:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.Where(builder.NotIn(cond.Key, convertx.ReflectSlice(cond.Val)...))
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.NotIn(rule.Key, convertx.ReflectSlice(rule.Val)...))
 			}
 		case Like:
-			builder.Where(builder.Like(cond.Key, cond.Val))
+			builder.Where(builder.Like(rule.Key, rule.Val))
 		case NotLike:
-			builder.Where(builder.NotLike(cond.Key, cond.Val))
+			builder.Where(builder.NotLike(rule.Key, rule.Val))
 		case Limit:
-			builder.Limit(cast.ToInt(cond.Val))
+			builder.Limit(cast.ToInt(rule.Val))
 		case Between:
-			value := convertx.ReflectSlice(cond.Val)
+			value := convertx.ReflectSlice(rule.Val)
 			if len(value) == 2 {
-				builder.Where(builder.Between(cond.Key, value[0], value[1]))
+				builder.Where(builder.Between(rule.Key, value[0], value[1]))
 			}
 		case OrderBy:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(cond.Val))...)
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(rule.Val))...)
 			}
 		}
 	}
 	return builder
 }
 
-func Delete(builder sqlbuilder.DeleteBuilder, conditions ...Condition) sqlbuilder.DeleteBuilder {
-	for _, cond := range conditions {
-		if cond.Skip {
+func Delete(builder sqlbuilder.DeleteBuilder, rules ...rule) sqlbuilder.DeleteBuilder {
+	for _, rule := range rules {
+		if rule.Skip {
 			continue
 		}
-		switch Op(strings.ToUpper(string(cond.Op))) {
+		switch Op(strings.ToUpper(string(rule.Op))) {
 		case E:
-			builder.Where(builder.Equal(cond.Key, cond.Val))
+			builder.Where(builder.Equal(rule.Key, rule.Val))
 		case NE:
-			builder.Where(builder.NotEqual(cond.Key, cond.Val))
+			builder.Where(builder.NotEqual(rule.Key, rule.Val))
 		case GT:
-			builder.Where(builder.GreaterThan(cond.Key, cond.Val))
+			builder.Where(builder.GreaterThan(rule.Key, rule.Val))
 		case LT:
-			builder.Where(builder.LessThan(cond.Key, cond.Val))
+			builder.Where(builder.LessThan(rule.Key, rule.Val))
 		case GTE:
-			builder.Where(builder.GreaterEqualThan(cond.Key, cond.Val))
+			builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
 		case LTE:
-			builder.Where(builder.LessEqualThan(cond.Key, cond.Val))
+			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
 		case In:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.Where(builder.In(cond.Key, convertx.ReflectSlice(cond.Val)...))
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.In(rule.Key, convertx.ReflectSlice(rule.Val)...))
 			}
 		case NotIn:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.Where(builder.NotIn(cond.Key, convertx.ReflectSlice(cond.Val)...))
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.NotIn(rule.Key, convertx.ReflectSlice(rule.Val)...))
 			}
 		case Like:
-			builder.Where(builder.Like(cond.Key, cond.Val))
+			builder.Where(builder.Like(rule.Key, rule.Val))
 		case NotLike:
-			builder.Where(builder.NotLike(cond.Key, cond.Val))
+			builder.Where(builder.NotLike(rule.Key, rule.Val))
 		case Limit:
-			builder.Limit(cast.ToInt(cond.Val))
+			builder.Limit(cast.ToInt(rule.Val))
 		case Between:
-			value := convertx.ReflectSlice(cond.Val)
+			value := convertx.ReflectSlice(rule.Val)
 			if len(value) == 2 {
-				builder.Where(builder.Between(cond.Key, value[0], value[1]))
+				builder.Where(builder.Between(rule.Key, value[0], value[1]))
 			}
 		case OrderBy:
-			if len(convertx.ReflectSlice(cond.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(cond.Val))...)
+			if len(convertx.ReflectSlice(rule.Val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(rule.Val))...)
 			}
 		}
 	}
