@@ -1,7 +1,7 @@
 package rule
 
 import (
-	"github.com/fuckqqcom/pkg/convertx"
+	"github.com/fuckqqcom/pkg/convert"
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/spf13/cast"
 	"strings"
@@ -67,12 +67,12 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...rule) sqlbuilder.SelectBu
 		case LTE:
 			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
 		case In:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.In(rule.Key, convertx.ReflectSlice(rule.Val)...))
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
 			}
 		case NotIn:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.NotIn(rule.Key, convertx.ReflectSlice(rule.Val)...))
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
 			}
 		case Like:
 			builder.Where(builder.Like(rule.Key, rule.Val))
@@ -83,13 +83,13 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...rule) sqlbuilder.SelectBu
 		case Offset:
 			builder.Offset(cast.ToInt(rule.Val))
 		case Between:
-			value := convertx.ReflectSlice(rule.Val)
+			value := convert.ReflectSlice(rule.Val)
 			if len(value) == 2 {
 				builder.Where(builder.Between(rule.Key, value[0], value[1]))
 			}
 		case OrderBy:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(rule.Val))...)
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
 			}
 		}
 	}
@@ -115,12 +115,12 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...rule) sqlbuilder.UpdateBu
 		case LTE:
 			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
 		case In:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.In(rule.Key, convertx.ReflectSlice(rule.Val)...))
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
 			}
 		case NotIn:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.NotIn(rule.Key, convertx.ReflectSlice(rule.Val)...))
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
 			}
 		case Like:
 			builder.Where(builder.Like(rule.Key, rule.Val))
@@ -129,13 +129,13 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...rule) sqlbuilder.UpdateBu
 		case Limit:
 			builder.Limit(cast.ToInt(rule.Val))
 		case Between:
-			value := convertx.ReflectSlice(rule.Val)
+			value := convert.ReflectSlice(rule.Val)
 			if len(value) == 2 {
 				builder.Where(builder.Between(rule.Key, value[0], value[1]))
 			}
 		case OrderBy:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(rule.Val))...)
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
 			}
 		}
 	}
@@ -161,12 +161,12 @@ func Delete(builder sqlbuilder.DeleteBuilder, rules ...rule) sqlbuilder.DeleteBu
 		case LTE:
 			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
 		case In:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.In(rule.Key, convertx.ReflectSlice(rule.Val)...))
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
 			}
 		case NotIn:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.NotIn(rule.Key, convertx.ReflectSlice(rule.Val)...))
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
 			}
 		case Like:
 			builder.Where(builder.Like(rule.Key, rule.Val))
@@ -175,13 +175,13 @@ func Delete(builder sqlbuilder.DeleteBuilder, rules ...rule) sqlbuilder.DeleteBu
 		case Limit:
 			builder.Limit(cast.ToInt(rule.Val))
 		case Between:
-			value := convertx.ReflectSlice(rule.Val)
+			value := convert.ReflectSlice(rule.Val)
 			if len(value) == 2 {
 				builder.Where(builder.Between(rule.Key, value[0], value[1]))
 			}
 		case OrderBy:
-			if len(convertx.ReflectSlice(rule.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(rule.Val))...)
+			if len(convert.ReflectSlice(rule.Val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
 			}
 		}
 	}
