@@ -44,11 +44,11 @@ type Rule struct {
 	Val any
 }
 
-func New(rules ...Rule) []Rule {
+func New(rules []Rule) []Rule {
 	return rules
 }
 
-func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
+func Select(builder sqlbuilder.SelectBuilder, rules []Rule) sqlbuilder.SelectBuilder {
 	for _, rule := range rules {
 		if rule.Skip {
 			continue
@@ -96,7 +96,7 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 	return builder
 }
 
-func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
+func Update(builder sqlbuilder.UpdateBuilder, rules []Rule) sqlbuilder.UpdateBuilder {
 	for _, rule := range rules {
 		if rule.Skip {
 			continue
@@ -142,7 +142,7 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBu
 	return builder
 }
 
-func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
+func Delete(builder sqlbuilder.DeleteBuilder, rules []Rule) sqlbuilder.DeleteBuilder {
 	for _, rule := range rules {
 		if rule.Skip {
 			continue
