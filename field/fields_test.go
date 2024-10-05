@@ -1,8 +1,6 @@
 package field
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 )
 
@@ -15,7 +13,9 @@ func TestCropModel(t *testing.T) {
 	a := A{Age: 100, Name: "xiaohan"}
 	//CropObjFields(&a, []string{"name"})
 	//CropObjFields
-	marshal, err := json.Marshal(a)
-	fmt.Println("a", a, string(marshal), err)
+	//marshal, err := json.Marshal(a)
+	//fmt.Println("a", a, string(marshal), err)
+
+	CropObjFields(&a, []string{"name"})
 
 }
