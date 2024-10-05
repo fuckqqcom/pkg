@@ -7,8 +7,8 @@ func Paginator(pageNum, pageSize int64) (int64, int64, int64) {
 	if pageSize <= 0 || pageSize >= 20 {
 		pageSize = 10
 	}
-	// num offset limit
-	return pageNum, (pageNum - 1) * pageSize, pageSize
+	// num limit,offset
+	return pageNum, pageSize, (pageNum - 1) * pageSize
 }
 
 func OrderBy(orderBy string) string {
