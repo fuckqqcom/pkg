@@ -1,13 +1,14 @@
 package paginator
 
-func Paginator(pageNum, pageSize int64) (int64, int64) {
+func Paginator(pageNum, pageSize int64) (int64, int64, int64) {
 	if pageNum <= 0 {
 		pageNum = 1
 	}
 	if pageSize <= 0 || pageSize >= 20 {
 		pageSize = 10
 	}
-	return pageNum, pageSize
+	// num offset limit
+	return pageNum, (pageNum - 1) * pageSize, pageSize
 }
 
 func OrderBy(orderBy string) string {
