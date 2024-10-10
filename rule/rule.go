@@ -37,153 +37,301 @@ const (
 )
 
 type Rule struct {
-	Skip bool
+	Skip     bool
+	SkipFunc func() bool
 
-	Key string
-	Op  Op
-	Val any
+	//or condition
+	Or         bool
+	OrOps      []Op
+	OrKeys     []string
+	OrVals     []any
+	OrValsFunc func() []any
+
+	// and condition
+	Key     string
+	Op      Op
+	Val     any
+	ValFunc func() any
 }
 
 func New(rules ...Rule) []Rule {
 	return rules
 }
 
-func Select(builder sqlbuilder.SelectBuilder, rules []Rule) sqlbuilder.SelectBuilder {
+func ApplySelect(builder *sqlbuilder.SelectBuilder, rules ...Rule) {
 	for _, rule := range rules {
+		if rule.SkipFunc != nil {
+			rule.Skip = rule.SkipFunc()
+		}
 		if rule.Skip {
 			continue
 		}
-		switch Op(strings.ToUpper(string(rule.Op))) {
-		case E:
-			builder.Where(builder.Equal(rule.Key, rule.Val))
-		case NE:
-			builder.Where(builder.NotEqual(rule.Key, rule.Val))
-		case GT:
-			builder.Where(builder.GreaterThan(rule.Key, rule.Val))
-		case LT:
-			builder.Where(builder.LessThan(rule.Key, rule.Val))
-		case GTE:
-			builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
-		case LTE:
-			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
-		case In:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
+		if rule.Or {
+			if rule.OrValsFunc != nil {
+				rule.OrVals = rule.OrValsFunc()
 			}
-		case NotIn:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
+			var expr []string
+			for i, field := range rule.OrKeys {
+				switch Op(strings.ToUpper(string(rule.OrOps[i]))) {
+				case Equal:
+					expr = append(expr, builder.Equal(field, rule.OrVals[i]))
+				case NotEqual:
+					expr = append(expr, builder.NotEqual(field, rule.OrVals[i]))
+				case GreaterThan:
+					expr = append(expr, builder.GreaterThan(field, rule.OrVals[i]))
+				case LessThan:
+					expr = append(expr, builder.LessThan(field, rule.OrVals[i]))
+				case GreaterEqualThan:
+					expr = append(expr, builder.GreaterEqualThan(field, rule.OrVals[i]))
+				case LessEqualThan:
+					expr = append(expr, builder.LessEqualThan(field, rule.OrVals[i]))
+				case In:
+					if len(convert.ReflectSlice(rule.OrVals[i])) > 0 {
+						expr = append(expr, builder.In(field, convert.ReflectSlice(rule.OrVals[i])...))
+					}
+				case NotIn:
+					if len(convert.ReflectSlice(rule.OrVals[i])) > 0 {
+						expr = append(expr, builder.NotIn(field, convert.ReflectSlice(rule.OrVals[i])...))
+					}
+				case Like:
+					expr = append(expr, builder.Like(field, rule.OrVals[i]))
+				case NotLike:
+					expr = append(expr, builder.NotLike(field, rule.OrVals[i]))
+				case Between:
+					value := convert.ReflectSlice(rule.OrVals[i])
+					if len(value) == 2 {
+						expr = append(expr, builder.Between(field, value[0], value[1]))
+					}
+				}
 			}
-		case Like:
-			builder.Where(builder.Like(rule.Key, rule.Val))
-		case NotLike:
-			builder.Where(builder.NotLike(rule.Key, rule.Val))
-		case Limit:
-			builder.Limit(cast.ToInt(rule.Val))
-		case Offset:
-			builder.Offset(cast.ToInt(rule.Val))
-		case Between:
-			value := convert.ReflectSlice(rule.Val)
-			if len(value) == 2 {
-				builder.Where(builder.Between(rule.Key, value[0], value[1]))
+			builder.Where(builder.Or(expr...))
+		} else {
+			if rule.ValFunc != nil {
+				rule.Val = rule.ValFunc()
 			}
-		case OrderBy:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
+			switch Op(strings.ToUpper(string(rule.Op))) {
+			case Equal:
+				builder.Where(builder.Equal(rule.Key, rule.Val))
+			case NotEqual:
+				builder.Where(builder.NotEqual(rule.Key, rule.Val))
+			case GreaterThan:
+				builder.Where(builder.GreaterThan(rule.Key, rule.Val))
+			case LessThan:
+				builder.Where(builder.LessThan(rule.Key, rule.Val))
+			case GreaterEqualThan:
+				builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
+			case LessEqualThan:
+				builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
+			case In:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
+				}
+			case NotIn:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
+				}
+			case Like:
+				builder.Where(builder.Like(rule.Key, rule.Val))
+			case NotLike:
+				builder.Where(builder.NotLike(rule.Key, rule.Val))
+			case Limit:
+				builder.Limit(cast.ToInt(rule.Val))
+			case Offset:
+				builder.Offset(cast.ToInt(rule.Val))
+			case Between:
+				value := convert.ReflectSlice(rule.Val)
+				if len(value) == 2 {
+					builder.Where(builder.Between(rule.Key, value[0], value[1]))
+				}
+			case OrderBy:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
+				}
 			}
 		}
 	}
-	return builder
 }
 
-func Update(builder sqlbuilder.UpdateBuilder, rules []Rule) sqlbuilder.UpdateBuilder {
+func ApplyUpdate(builder *sqlbuilder.UpdateBuilder, rules ...Rule) {
 	for _, rule := range rules {
+		if rule.SkipFunc != nil {
+			rule.Skip = rule.SkipFunc()
+		}
 		if rule.Skip {
 			continue
 		}
-		switch Op(strings.ToUpper(string(rule.Op))) {
-		case E:
-			builder.Where(builder.Equal(rule.Key, rule.Val))
-		case NE:
-			builder.Where(builder.NotEqual(rule.Key, rule.Val))
-		case GT:
-			builder.Where(builder.GreaterThan(rule.Key, rule.Val))
-		case LT:
-			builder.Where(builder.LessThan(rule.Key, rule.Val))
-		case GTE:
-			builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
-		case LTE:
-			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
-		case In:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
+		if rule.Or {
+			if rule.OrValsFunc != nil {
+				rule.OrVals = rule.OrValsFunc()
 			}
-		case NotIn:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
+			var expr []string
+			for i, field := range rule.OrKeys {
+				switch Op(strings.ToUpper(string(rule.OrOps[i]))) {
+				case Equal:
+					expr = append(expr, builder.Equal(field, rule.OrVals[i]))
+				case NotEqual:
+					expr = append(expr, builder.NotEqual(field, rule.OrVals[i]))
+				case GreaterThan:
+					expr = append(expr, builder.GreaterThan(field, rule.OrVals[i]))
+				case LessThan:
+					expr = append(expr, builder.LessThan(field, rule.OrVals[i]))
+				case GreaterEqualThan:
+					expr = append(expr, builder.GreaterEqualThan(field, rule.OrVals[i]))
+				case LessEqualThan:
+					expr = append(expr, builder.LessEqualThan(field, rule.OrVals[i]))
+				case In:
+					if len(convert.ReflectSlice(rule.OrVals[i])) > 0 {
+						expr = append(expr, builder.In(field, convert.ReflectSlice(rule.OrVals[i])...))
+					}
+				case NotIn:
+					if len(convert.ReflectSlice(rule.OrVals[i])) > 0 {
+						expr = append(expr, builder.NotIn(field, convert.ReflectSlice(rule.OrVals[i])...))
+					}
+				case Like:
+					expr = append(expr, builder.Like(field, rule.OrVals[i]))
+				case NotLike:
+					expr = append(expr, builder.NotLike(field, rule.OrVals[i]))
+				case Between:
+					value := convert.ReflectSlice(rule.OrVals[i])
+					if len(value) == 2 {
+						expr = append(expr, builder.Between(field, value[0], value[1]))
+					}
+				}
 			}
-		case Like:
-			builder.Where(builder.Like(rule.Key, rule.Val))
-		case NotLike:
-			builder.Where(builder.NotLike(rule.Key, rule.Val))
-		case Limit:
-			builder.Limit(cast.ToInt(rule.Val))
-		case Between:
-			value := convert.ReflectSlice(rule.Val)
-			if len(value) == 2 {
-				builder.Where(builder.Between(rule.Key, value[0], value[1]))
+			builder.Where(builder.Or(expr...))
+		} else {
+			if rule.ValFunc != nil {
+				rule.Val = rule.ValFunc()
 			}
-		case OrderBy:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
+			switch Op(strings.ToUpper(string(rule.Op))) {
+			case Equal:
+				builder.Where(builder.Equal(rule.Key, rule.Val))
+			case NotEqual:
+				builder.Where(builder.NotEqual(rule.Key, rule.Val))
+			case GreaterThan:
+				builder.Where(builder.GreaterThan(rule.Key, rule.Val))
+			case LessThan:
+				builder.Where(builder.LessThan(rule.Key, rule.Val))
+			case GreaterEqualThan:
+				builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
+			case LessEqualThan:
+				builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
+			case In:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
+				}
+			case NotIn:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
+				}
+			case Like:
+				builder.Where(builder.Like(rule.Key, rule.Val))
+			case NotLike:
+				builder.Where(builder.NotLike(rule.Key, rule.Val))
+			case Limit:
+				builder.Limit(cast.ToInt(rule.Val))
+			case Between:
+				value := convert.ReflectSlice(rule.Val)
+				if len(value) == 2 {
+					builder.Where(builder.Between(rule.Key, value[0], value[1]))
+				}
+			case OrderBy:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
+				}
 			}
 		}
 	}
-	return builder
 }
 
-func Delete(builder sqlbuilder.DeleteBuilder, rules []Rule) sqlbuilder.DeleteBuilder {
+func ApplyDelete(builder *sqlbuilder.DeleteBuilder, rules ...Rule) {
 	for _, rule := range rules {
+		if rule.SkipFunc != nil {
+			rule.Skip = rule.SkipFunc()
+		}
 		if rule.Skip {
 			continue
 		}
-		switch Op(strings.ToUpper(string(rule.Op))) {
-		case E:
-			builder.Where(builder.Equal(rule.Key, rule.Val))
-		case NE:
-			builder.Where(builder.NotEqual(rule.Key, rule.Val))
-		case GT:
-			builder.Where(builder.GreaterThan(rule.Key, rule.Val))
-		case LT:
-			builder.Where(builder.LessThan(rule.Key, rule.Val))
-		case GTE:
-			builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
-		case LTE:
-			builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
-		case In:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
+		if rule.Or {
+			if rule.OrValsFunc != nil {
+				rule.OrVals = rule.OrValsFunc()
 			}
-		case NotIn:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
+			var expr []string
+			for i, field := range rule.OrKeys {
+				switch Op(strings.ToUpper(string(rule.OrOps[i]))) {
+				case Equal:
+					expr = append(expr, builder.Equal(field, rule.OrVals[i]))
+				case NotEqual:
+					expr = append(expr, builder.NotEqual(field, rule.OrVals[i]))
+				case GreaterThan:
+					expr = append(expr, builder.GreaterThan(field, rule.OrVals[i]))
+				case LessThan:
+					expr = append(expr, builder.LessThan(field, rule.OrVals[i]))
+				case GreaterEqualThan:
+					expr = append(expr, builder.GreaterEqualThan(field, rule.OrVals[i]))
+				case LessEqualThan:
+					expr = append(expr, builder.LessEqualThan(field, rule.OrVals[i]))
+				case In:
+					if len(convert.ReflectSlice(rule.OrVals[i])) > 0 {
+						expr = append(expr, builder.In(field, convert.ReflectSlice(rule.OrVals[i])...))
+					}
+				case NotIn:
+					if len(convert.ReflectSlice(rule.OrVals[i])) > 0 {
+						expr = append(expr, builder.NotIn(field, convert.ReflectSlice(rule.OrVals[i])...))
+					}
+				case Like:
+					expr = append(expr, builder.Like(field, rule.OrVals[i]))
+				case NotLike:
+					expr = append(expr, builder.NotLike(field, rule.OrVals[i]))
+				case Between:
+					value := convert.ReflectSlice(rule.OrVals[i])
+					if len(value) == 2 {
+						expr = append(expr, builder.Between(field, value[0], value[1]))
+					}
+				}
 			}
-		case Like:
-			builder.Where(builder.Like(rule.Key, rule.Val))
-		case NotLike:
-			builder.Where(builder.NotLike(rule.Key, rule.Val))
-		case Limit:
-			builder.Limit(cast.ToInt(rule.Val))
-		case Between:
-			value := convert.ReflectSlice(rule.Val)
-			if len(value) == 2 {
-				builder.Where(builder.Between(rule.Key, value[0], value[1]))
+			builder.Where(builder.Or(expr...))
+		} else {
+			if rule.ValFunc != nil {
+				rule.Val = rule.ValFunc()
 			}
-		case OrderBy:
-			if len(convert.ReflectSlice(rule.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
+			switch Op(strings.ToUpper(string(rule.Op))) {
+			case Equal:
+				builder.Where(builder.Equal(rule.Key, rule.Val))
+			case NotEqual:
+				builder.Where(builder.NotEqual(rule.Key, rule.Val))
+			case GreaterThan:
+				builder.Where(builder.GreaterThan(rule.Key, rule.Val))
+			case LessThan:
+				builder.Where(builder.LessThan(rule.Key, rule.Val))
+			case GreaterEqualThan:
+				builder.Where(builder.GreaterEqualThan(rule.Key, rule.Val))
+			case LessEqualThan:
+				builder.Where(builder.LessEqualThan(rule.Key, rule.Val))
+			case In:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.Where(builder.In(rule.Key, convert.ReflectSlice(rule.Val)...))
+				}
+			case NotIn:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.Where(builder.NotIn(rule.Key, convert.ReflectSlice(rule.Val)...))
+				}
+			case Like:
+				builder.Where(builder.Like(rule.Key, rule.Val))
+			case NotLike:
+				builder.Where(builder.NotLike(rule.Key, rule.Val))
+			case Limit:
+				builder.Limit(cast.ToInt(rule.Val))
+			case Between:
+				value := convert.ReflectSlice(rule.Val)
+				if len(value) == 2 {
+					builder.Where(builder.Between(rule.Key, value[0], value[1]))
+				}
+			case OrderBy:
+				if len(convert.ReflectSlice(rule.Val)) > 0 {
+					builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(rule.Val))...)
+				}
 			}
 		}
 	}
-	return builder
 }
