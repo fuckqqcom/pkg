@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+/*
+	照搬 https://github.com/jzero-io/jzero-contrib/tree/main/condition
+
+*/
+
 type Op string
 
 func (o Op) String() string {
@@ -58,7 +63,7 @@ func New(rules ...Rule) []Rule {
 	return rules
 }
 
-func ApplySelect(builder *sqlbuilder.SelectBuilder, rules ...Rule) {
+func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
 	for _, rule := range rules {
 		if rule.SkipFunc != nil {
 			rule.Skip = rule.SkipFunc()
@@ -150,9 +155,10 @@ func ApplySelect(builder *sqlbuilder.SelectBuilder, rules ...Rule) {
 			}
 		}
 	}
+	return builder
 }
 
-func ApplyUpdate(builder *sqlbuilder.UpdateBuilder, rules ...Rule) {
+func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
 	for _, rule := range rules {
 		if rule.SkipFunc != nil {
 			rule.Skip = rule.SkipFunc()
@@ -242,9 +248,10 @@ func ApplyUpdate(builder *sqlbuilder.UpdateBuilder, rules ...Rule) {
 			}
 		}
 	}
+	return builder
 }
 
-func ApplyDelete(builder *sqlbuilder.DeleteBuilder, rules ...Rule) {
+func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
 	for _, rule := range rules {
 		if rule.SkipFunc != nil {
 			rule.Skip = rule.SkipFunc()
@@ -334,4 +341,6 @@ func ApplyDelete(builder *sqlbuilder.DeleteBuilder, rules ...Rule) {
 			}
 		}
 	}
+
+	return builder
 }
