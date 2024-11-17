@@ -10,5 +10,5 @@ type Config struct {
 	Conn  sqlx.SqlConn
 	Cache cache.CacheConf //redis缓存
 	Redis redis.Redis
-	Opts  cache.Option
+	Opts  []cache.Option
 }
