@@ -42,6 +42,8 @@ const (
 )
 
 type Rule struct {
+	Key string
+
 	Skip     bool
 	SkipFunc func() bool
 
@@ -53,7 +55,6 @@ type Rule struct {
 	OrValsFunc func() []any
 
 	// and condition
-	Key     string
 	Op      Op
 	Val     any
 	ValFunc func() any
