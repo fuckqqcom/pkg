@@ -54,7 +54,7 @@ func (f *Field) ValFunc(valFunc func() any) Option {
 }
 
 // Bind 将 Field 应用到目标对象上，返回错误列表
-func (f *Field) Bind(obj any) {
+func (f *Field) Bind(obj any) (errs []error) {
 	vals := reflect.ValueOf(obj).Elem()
 
 	// 遍历当前 Field 链表，逐个处理
@@ -74,7 +74,7 @@ func (f *Field) Bind(obj any) {
 
 		// 如果字段无效，返回错误
 		if !val.IsValid() {
-			f.errs = append(f.errs, fmt.Errorf("field %s not found", field.Key))
+			errs = append(errs, fmt.Errorf("field %s not found", field.Key))
 			continue
 		}
 
