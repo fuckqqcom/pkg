@@ -28,32 +28,20 @@ func TestField_ApplyTo(t *testing.T) {
 		Age   int
 		Email string
 	}
-	p := &Person{}
-
+	p := &Person{Age: 60}
 	f := NewField()
-
-	f.SetVal("Name", "John").
-		Next().
-		SetVal("Age", 30).
+	f.SetVal("Name", "John", f.SkipFunc(func() bool {
+		return false
+	})).
 		Next().
 		SetVal("Email", "john@example.com",
 			f.SkipFunc(func() bool {
-				// 模拟条件判断，决定是否跳过字段
-				return false
+				return true
 			}),
 			f.ValFunc(func() any {
-				// 动态计算值
 				return "new-email@example.com"
 			}),
 		)
-
-	// 应用配置到对象
-	errs := f.ApplyTo(p)
-	if len(errs) > 0 {
-		for _, err := range errs {
-			fmt.Println("Error:", err)
-		}
-	} else {
-		fmt.Println("Updated Person:", p)
-	}
+	errs := f.Bind(p)
+	fmt.Println("Updated Person:", p, errs)
 }

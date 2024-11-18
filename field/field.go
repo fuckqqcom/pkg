@@ -8,7 +8,7 @@ import (
 // Field 结构体定义
 type Field struct {
 	Key      string
-	Val      any
+	val      any
 	skipFunc func() bool
 	valFunc  func() any
 	next     *Field
@@ -22,7 +22,7 @@ func NewField() *Field {
 // SetVal 设置 Field 的值，并接受可选的配置参数 opts，用于定制化行为
 func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
 	f.Key = key
-	f.Val = val
+	f.val = val
 
 	// 应用所有传入的配置选项
 	for _, opt := range opts {
@@ -31,7 +31,7 @@ func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
 
 	// 如果有 next 字段，继续设置下一个 Field
 	if f.next != nil {
-		return f.next.SetVal(f.next.Key, f.next.Val, opts...)
+		return f.next.SetVal(f.next.Key, f.next.val, opts...)
 	}
 
 	// 返回当前 Field 支持链式调用
@@ -52,8 +52,8 @@ func (f *Field) ValFunc(valFunc func() any) Option {
 	}
 }
 
-// ApplyTo 将 Field 应用到目标对象上，返回错误列表
-func (f *Field) ApplyTo(obj any) (errs []error) {
+// Bind 将 Field 应用到目标对象上，返回错误列表
+func (f *Field) Bind(obj any) (errs []error) {
 	vals := reflect.ValueOf(obj).Elem()
 
 	// 遍历当前 Field 链表，逐个处理
@@ -65,7 +65,7 @@ func (f *Field) ApplyTo(obj any) (errs []error) {
 
 		// 如果 ValFunc 存在，则通过它计算字段的值
 		if field.valFunc != nil {
-			field.Val = field.valFunc()
+			field.val = field.valFunc()
 		}
 
 		// 通过反射获取目标对象中对应的字段
@@ -79,7 +79,7 @@ func (f *Field) ApplyTo(obj any) (errs []error) {
 
 		// 如果字段可设置，赋值
 		if val.CanSet() {
-			val.Set(reflect.ValueOf(field.Val))
+			val.Set(reflect.ValueOf(field.val))
 		}
 	}
 
