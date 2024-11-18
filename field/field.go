@@ -11,7 +11,7 @@ type Field struct {
 	val      any
 	skipFunc func() bool
 	valFunc  func() any
-	next     *Field
+	node     *Field // private field
 }
 
 // NewField 创建新的 Field 实例
@@ -29,10 +29,13 @@ func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
 		opt(f)
 	}
 
-	// 如果有 next 字段，继续设置下一个 Field
-	if f.next != nil {
-		return f.next.SetVal(f.next.Key, f.next.val, opts...)
+	// 如果有 node 字段，继续设置下一个 Field
+	if f.node != nil {
+		return f.node.SetVal(f.node.Key, f.node.val, opts...)
 	}
+
+	// 如果没有 node 字段，自动通过 next 创建下一个 Field
+	f.next() // 自动创建链条中的下一个 Field
 
 	// 返回当前 Field 支持链式调用
 	return f
@@ -57,7 +60,7 @@ func (f *Field) Bind(obj any) (errs []error) {
 	vals := reflect.ValueOf(obj).Elem()
 
 	// 遍历当前 Field 链表，逐个处理
-	for field := f; field != nil; field = field.next {
+	for field := f; field != nil; field = field.node {
 		// 如果 SkipFunc 返回 true，则跳过此字段
 		if field.skipFunc != nil && field.skipFunc() {
 			continue
@@ -86,11 +89,15 @@ func (f *Field) Bind(obj any) (errs []error) {
 	return
 }
 
-// Next 方法创建并返回下一个 Field，用于链式调用
-func (f *Field) Next() *Field {
-	field := &Field{}
-	f.next = field
-	return field
+// node 私有方法，用于设置链式字段的下一个 Field
+func (f *Field) next() *Field {
+	// 如果已经有 node 字段，跳过创建
+	if f.node != nil {
+		return f.node
+	}
+	// 创建并链式连接下一个 Field
+	f.node = &Field{}
+	return f.node
 }
 
 // Option 类型用于对 Field 进行配置

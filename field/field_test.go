@@ -33,15 +33,15 @@ func TestField_ApplyTo(t *testing.T) {
 	f.SetVal("Name", "John", f.SkipFunc(func() bool {
 		return false
 	})).
-		Next().
 		SetVal("Email", "john@example.com",
 			f.SkipFunc(func() bool {
-				return true
+				return false
 			}),
 			f.ValFunc(func() any {
 				return "new-email@example.com"
 			}),
 		)
 	f.Bind(p)
+	fmt.Println(p)
 
 }
