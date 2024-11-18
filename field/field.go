@@ -12,7 +12,6 @@ type Field struct {
 	skipFunc func() bool
 	valFunc  func() any
 	next     *Field
-	errs     []error
 }
 
 // NewField 创建新的 Field 实例

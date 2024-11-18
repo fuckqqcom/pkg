@@ -43,7 +43,5 @@ func TestField_ApplyTo(t *testing.T) {
 			}),
 		)
 	f.Bind(p)
-	if f.errs != nil {
-		fmt.Println("Updated Person:", p, f.errs)
-	}
+
 }
