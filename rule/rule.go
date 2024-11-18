@@ -60,7 +60,7 @@ type Rule struct {
 	ValFunc func() any
 }
 
-func New(rules ...Rule) []Rule {
+func NewRule(rules ...Rule) []Rule {
 	return rules
 }
 
