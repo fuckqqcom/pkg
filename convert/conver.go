@@ -46,14 +46,18 @@ func ToBytes(value any) ([]byte, error) {
 }
 
 func ContainIgnoreCase(target string, arr []string) bool {
+	// 将目标字符串转为小写
 	target = strings.ToLower(target)
 
+	// 将切片中的所有字符串转为小写，并存入一个 map 中
+	lowercaseMap := make(map[string]struct{}, len(arr))
 	for _, item := range arr {
-		if strings.ToLower(item) == target {
-			return true
-		}
+		lowercaseMap[strings.ToLower(item)] = struct{}{}
 	}
-	return false
+
+	// 检查目标字符串是否存在于 map 中
+	_, found := lowercaseMap[target]
+	return found
 }
 
 func Contains[T comparable](target T, arr []T) bool {
