@@ -12,6 +12,7 @@ type Field struct {
 	skipFunc func() bool
 	valFunc  func() any
 	next     *Field
+	errs     []error
 }
 
 // NewField 创建新的 Field 实例
@@ -53,7 +54,7 @@ func (f *Field) ValFunc(valFunc func() any) Option {
 }
 
 // Bind 将 Field 应用到目标对象上，返回错误列表
-func (f *Field) Bind(obj any) (errs []error) {
+func (f *Field) Bind(obj any) {
 	vals := reflect.ValueOf(obj).Elem()
 
 	// 遍历当前 Field 链表，逐个处理
@@ -73,7 +74,7 @@ func (f *Field) Bind(obj any) (errs []error) {
 
 		// 如果字段无效，返回错误
 		if !val.IsValid() {
-			errs = append(errs, fmt.Errorf("field %s not found", field.Key))
+			f.errs = append(f.errs, fmt.Errorf("field %s not found", field.Key))
 			continue
 		}
 
@@ -83,7 +84,7 @@ func (f *Field) Bind(obj any) (errs []error) {
 		}
 	}
 
-	return errs
+	return
 }
 
 // Next 方法创建并返回下一个 Field，用于链式调用

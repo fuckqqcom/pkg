@@ -42,6 +42,8 @@ func TestField_ApplyTo(t *testing.T) {
 				return "new-email@example.com"
 			}),
 		)
-	errs := f.Bind(p)
-	fmt.Println("Updated Person:", p, errs)
+	f.Bind(p)
+	if f.errs != nil {
+		fmt.Println("Updated Person:", p, f.errs)
+	}
 }
