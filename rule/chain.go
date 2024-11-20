@@ -5,105 +5,145 @@ import (
 	"github.com/fuckqqcom/pkg/opts"
 )
 
-// 操作符定义
+type Chain struct {
+	rules []Rule
+}
 
-// ChainOperatorOpts 是一个选项结构体，表示链式操作符的配置
-type ChainOperatorOpts struct {
-	Skip         bool
-	SkipFunc     func() bool
-	ValueFunc    func() any
+type ChainOptions struct {
+	Skip     bool
+	SkipFunc func() bool
+
+	ValueFunc func() any
+
 	OrValuesFunc func() []any
 }
 
-func (opts ChainOperatorOpts) DefaultOptions() ChainOperatorOpts {
-	return ChainOperatorOpts{}
+func (opts ChainOptions) Options() ChainOptions {
+	return ChainOptions{}
 }
 
-func WithSkip(skip bool) opt.Opt[ChainOperatorOpts] {
-	return func(c *ChainOperatorOpts) {
+func WithSkip(skip bool) opt.Opt[ChainOptions] {
+	return func(c *ChainOptions) {
 		c.Skip = skip
 	}
 }
 
-func WithSkipFunc(skipFunc func() bool) opt.Opt[ChainOperatorOpts] {
-	return func(c *ChainOperatorOpts) {
+func WithSkipFunc(skipFunc func() bool) opt.Opt[ChainOptions] {
+	return func(c *ChainOptions) {
 		c.SkipFunc = skipFunc
 	}
 }
 
-func WithValue(value any) opt.Opt[ChainOperatorOpts] {
-	return func(c *ChainOperatorOpts) {
+func WithValue(value any) opt.Opt[ChainOptions] {
+	return func(c *ChainOptions) {
 		c.ValueFunc = func() any {
 			return value
 		}
 	}
 }
 
-func WithOrValues(orValues []any) opt.Opt[ChainOperatorOpts] {
-	return func(c *ChainOperatorOpts) {
+func WithOrValues(orValues []any) opt.Opt[ChainOptions] {
+	return func(c *ChainOptions) {
 		c.OrValuesFunc = func() []any {
 			return orValues
 		}
 	}
 }
 
-// Chain 表示一个条件链，可以链接多个查询条件
-type Chain struct {
-	rules []Rule
-}
-
 func NewChain() Chain {
 	return Chain{}
 }
 
-// AddRule 是通用的条件添加方法
-func (c Chain) AddRule(key string, op Op, val any, opts ...opt.Opt[ChainOperatorOpts]) Chain {
+func NewChainRules(rules ...Rule) Chain {
+	return Chain{rules: rules}
+}
+
+func (c Chain) add(field string, op Op, value any, opts ...opt.Opt[ChainOptions]) Chain {
 	o := opt.Bind(opts...)
-	rule := Rule{
-		Key:      key,
-		Op:       op,
-		Val:      val,
-		Skip:     o.Skip,
-		SkipFunc: o.SkipFunc,
-		ValFunc:  o.ValueFunc,
-	}
-	c.rules = append(c.rules, rule)
+	c.rules = append(c.rules, Rule{
+		Key:        field,
+		Op:         op,
+		Val:        value,
+		Skip:       o.Skip,
+		SkipFunc:   o.SkipFunc,
+		OrValsFunc: o.OrValuesFunc,
+	})
 	return c
 }
 
-// 以下是更新后的条件方法，操作符名称改为简写：
-
-// E 添加等于条件
-func (c Chain) E(key string, val any, op ...opt.Opt[ChainOperatorOpts]) Chain {
-	return c.AddRule(key, E, val, op...)
+func (c Chain) E(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, E, value, opts...)
 }
 
-// NE 添加不等于条件
-func (c Chain) NE(key string, val any, op ...opt.Opt[ChainOperatorOpts]) Chain {
-	return c.AddRule(key, NE, val, op...)
+func (c Chain) NE(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, NE, value, opts...)
 }
 
-// GT 添加大于条件
-func (c Chain) GT(key string, val any, op ...opt.Opt[ChainOperatorOpts]) Chain {
-	return c.AddRule(key, GT, val, op...)
+func (c Chain) GT(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, GT, value, opts...)
 }
 
-// LT 添加小于条件
-func (c Chain) LT(key string, val any, op ...opt.Opt[ChainOperatorOpts]) Chain {
-	return c.AddRule(key, LT, val, op...)
+func (c Chain) LT(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, LT, value, opts...)
 }
 
-// GTE 添加大于等于条件
-func (c Chain) GTE(key string, val any, op ...opt.Opt[ChainOperatorOpts]) Chain {
-	return c.AddRule(key, GTE, val, op...)
+func (c Chain) GTE(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, GTE, value, opts...)
 }
 
-// LTE 添加小于等于条件
-func (c Chain) LTE(key string, val any, op ...opt.Opt[ChainOperatorOpts]) Chain {
-	return c.AddRule(key, LTE, val, op...)
+func (c Chain) LTE(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, LTE, value, opts...)
 }
 
-// ToRules 返回所有的规则
-func (c Chain) Bind() []Rule {
+func (c Chain) Like(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, Like, value, opts...)
+}
+
+func (c Chain) NotLike(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, NotLike, value, opts...)
+}
+
+func (c Chain) In(field string, values any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, In, values, opts...)
+}
+
+func (c Chain) NotIn(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, NotIn, value, opts...)
+}
+
+func (c Chain) Between(field string, value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add(field, Between, value, opts...)
+}
+
+func (c Chain) Or(fields []string, values []any, opts ...opt.Opt[ChainOptions]) Chain {
+	o := opt.Bind(opts...)
+	c.rules = append(c.rules, Rule{
+		Or:         true,
+		OrKeys:     fields,
+		OrVals:     values,
+		Skip:       o.Skip,
+		SkipFunc:   o.SkipFunc,
+		OrValsFunc: o.OrValuesFunc,
+	})
+	return c
+}
+
+func (c Chain) OrderBy(value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add("", OrderBy, value, opts...)
+}
+
+func (c Chain) Limit(value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add("", Limit, value, opts...)
+}
+
+func (c Chain) Offset(value any, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add("", Offset, value, opts...)
+}
+
+func (c Chain) Page(page, pageSize int, opts ...opt.Opt[ChainOptions]) Chain {
+	return c.add("", Offset, (page-1)*pageSize, opts...).add("", Limit, pageSize, opts...)
+}
+
+func (c Chain) Build() []Rule {
 	return c.rules
 }

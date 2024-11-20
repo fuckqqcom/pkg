@@ -2,16 +2,27 @@ package rule
 
 import (
 	"fmt"
+	"github.com/huandu/go-sqlbuilder"
 	"testing"
 )
 
 func TestChain_ToRules(t *testing.T) {
-	c := NewChain().
-		E("age", 30, WithSkip(true), WithValue(30)).
-		GT("salary", 5000)
+	sb := sqlbuilder.NewSelectBuilder().Select("name", "age").From("user")
 
-	// 打印所有规则
-	for _, rule := range c.Bind() {
-		fmt.Printf("Key: %s, Operator: %s, Value: %v\n", rule.Key, rule.Op, rule.Val)
-	}
+	chain := NewChain().
+		E("field1", "value1", WithSkip(true)).
+		E("field2", "value2").
+		OrderBy("create_time desc").
+		OrderBy("sort desc")
+	builder := Select(*sb, chain.Build()...)
+	sql, args := builder.Build()
+	fmt.Println(sql)
+	fmt.Println(args)
+
+	chain = chain.NE("1", "value")
+	builder = Select(*sb, chain.Build()...)
+
+	sql, args = builder.Build()
+	fmt.Println(sql)
+	fmt.Println(args)
 }
