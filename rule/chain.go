@@ -152,6 +152,6 @@ func (c Chain) Page(page, pageSize int, opts ...opt.Opt[ChainOptions]) Chain {
 	return c.add("", Offset, (page-1)*pageSize, opts...).add("", Limit, pageSize, opts...)
 }
 
-func (c Chain) Build() []Rule {
+func (c Chain) Rule() []Rule {
 	return c.rules
 }
