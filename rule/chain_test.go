@@ -11,7 +11,9 @@ func TestChain_ToRules(t *testing.T) {
 
 	chain := NewChain().
 		E("field1", "value1", WithSkip(true)).
-		E("field2", "value2").
+		E("field2", "value2", WithValFunc(func() any {
+			return "100"
+		})).
 		OrderBy("create_time desc").
 		OrderBy("sort desc")
 	builder := Select(*sb, chain.Build()...)
@@ -19,10 +21,10 @@ func TestChain_ToRules(t *testing.T) {
 	fmt.Println(sql)
 	fmt.Println(args)
 
-	chain = chain.NE("1", "value")
-	builder = Select(*sb, chain.Build()...)
-
-	sql, args = builder.Build()
-	fmt.Println(sql)
-	fmt.Println(args)
+	//chain = chain.NE("1", "value")
+	//builder = Select(*sb, chain.Build()...)
+	//
+	//sql, args = builder.Build()
+	//fmt.Println(sql)
+	//fmt.Println(args)
 }

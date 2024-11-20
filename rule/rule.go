@@ -39,7 +39,7 @@ const (
 type Rule struct {
 	Key string
 
-	Skip     bool
+	skip     bool
 	SkipFunc func() bool
 
 	// Or condition
@@ -101,9 +101,9 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 	for _, r := range rules {
 		// Skip logic
 		if r.SkipFunc != nil {
-			r.Skip = r.SkipFunc()
+			r.skip = r.SkipFunc()
 		}
-		if r.Skip {
+		if r.skip {
 			continue
 		}
 
@@ -138,9 +138,9 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
-			r.Skip = r.SkipFunc()
+			r.skip = r.SkipFunc()
 		}
-		if r.Skip {
+		if r.skip {
 			continue
 		}
 		if r.ValFunc != nil {
@@ -171,9 +171,9 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBu
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
-			r.Skip = r.SkipFunc()
+			r.skip = r.SkipFunc()
 		}
-		if r.Skip {
+		if r.skip {
 			continue
 		}
 		if r.ValFunc != nil {
@@ -199,9 +199,9 @@ func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBu
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
-			r.Skip = r.SkipFunc()
+			r.skip = r.SkipFunc()
 		}
-		if r.Skip {
+		if r.skip {
 			continue
 		}
 		if r.ValFunc != nil {

@@ -10,12 +10,14 @@ type Chain struct {
 }
 
 type ChainOptions struct {
-	Skip     bool
+	skip     bool
 	SkipFunc func() bool
 
-	ValueFunc func() any
+	ValFunc func() any
+	val     any
 
-	OrValuesFunc func() []any
+	orVals     []any
+	OrValsFunc func() []any
 }
 
 func (opts ChainOptions) Options() ChainOptions {
@@ -24,7 +26,7 @@ func (opts ChainOptions) Options() ChainOptions {
 
 func WithSkip(skip bool) opt.Opt[ChainOptions] {
 	return func(c *ChainOptions) {
-		c.Skip = skip
+		c.skip = skip
 	}
 }
 
@@ -34,19 +36,21 @@ func WithSkipFunc(skipFunc func() bool) opt.Opt[ChainOptions] {
 	}
 }
 
-func WithValue(value any) opt.Opt[ChainOptions] {
+func WithValFunc(valFunc func() any) opt.Opt[ChainOptions] {
 	return func(c *ChainOptions) {
-		c.ValueFunc = func() any {
-			return value
-		}
+		c.ValFunc = valFunc
 	}
 }
 
-func WithOrValues(orValues []any) opt.Opt[ChainOptions] {
+func WithOrVals(orVals []any) opt.Opt[ChainOptions] {
 	return func(c *ChainOptions) {
-		c.OrValuesFunc = func() []any {
-			return orValues
-		}
+		c.orVals = orVals
+	}
+}
+
+func WithOrValsFunc(orValsFunc func() []any) opt.Opt[ChainOptions] {
+	return func(c *ChainOptions) {
+		c.OrValsFunc = orValsFunc
 	}
 }
 
@@ -58,15 +62,17 @@ func NewChainRules(rules ...Rule) Chain {
 	return Chain{rules: rules}
 }
 
-func (c Chain) add(field string, op Op, value any, opts ...opt.Opt[ChainOptions]) Chain {
+func (c Chain) add(field string, op Op, val any, opts ...opt.Opt[ChainOptions]) Chain {
 	o := opt.Bind(opts...)
 	c.rules = append(c.rules, Rule{
 		Key:        field,
 		Op:         op,
-		Val:        value,
-		Skip:       o.Skip,
+		Val:        val,
+		skip:       o.skip,
 		SkipFunc:   o.SkipFunc,
-		OrValsFunc: o.OrValuesFunc,
+		ValFunc:    o.ValFunc,
+		OrVals:     o.orVals,
+		OrValsFunc: o.OrValsFunc,
 	})
 	return c
 }
@@ -121,9 +127,9 @@ func (c Chain) Or(fields []string, values []any, opts ...opt.Opt[ChainOptions]) 
 		Or:         true,
 		OrKeys:     fields,
 		OrVals:     values,
-		Skip:       o.Skip,
+		skip:       o.skip,
 		SkipFunc:   o.SkipFunc,
-		OrValsFunc: o.OrValuesFunc,
+		OrValsFunc: o.OrValsFunc,
 	})
 	return c
 }
