@@ -33,7 +33,7 @@ const (
 	Offset    Op = "OFFSET"
 	Between   Op = "BETWEEN"
 	OrderBy   Op = "ORDER BY"
-	FindINSet Op = "FIND_IN_SET"
+	FindInSet Op = "FIND_IN_SET"
 )
 
 type Rule struct {
@@ -155,7 +155,7 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 			if len(convert.ReflectSlice(r.val)) > 0 {
 				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.val))...)
 			}
-		case FindINSet:
+		case FindInSet:
 			builder.Where(fmt.Sprintf("FIND_IN_SET(%s, %s)", builder.Var(r.val), builder.Var(r.Key)))
 		}
 	}
