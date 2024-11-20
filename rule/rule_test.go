@@ -16,7 +16,7 @@ func TestSelect(t *testing.T) {
 		},
 		Key: "name",
 		Op:  E,
-		Val: "jaronnie",
+		val: "jaronnie",
 		ValFunc: func() any {
 			return "jaronnie2"
 		},
@@ -24,7 +24,7 @@ func TestSelect(t *testing.T) {
 		Or:     true,
 		OrKeys: []string{"age", "height"},
 		OrOps:  []Op{Between, Between},
-		OrVals: values,
+		orVals: values,
 		OrValsFunc: func() []any {
 			return []any{[]int{24, 49}, []int{170, 176}}
 		},
@@ -32,11 +32,11 @@ func TestSelect(t *testing.T) {
 		Rule{
 			Key: "name",
 			Op:  FindINSet,
-			Val: "jaronnie",
+			val: "jaronnie",
 		},
 		Rule{
 			Op:  Limit,
-			Val: 10,
+			val: 10,
 		},
 	)
 

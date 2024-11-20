@@ -46,12 +46,12 @@ type Rule struct {
 	Or         bool
 	OrOps      []Op
 	OrKeys     []string
-	OrVals     []any
+	orVals     []any
 	OrValsFunc func() []any
 
 	// And condition
 	Op      Op
-	Val     any
+	val     any
 	ValFunc func() any
 }
 
@@ -110,11 +110,11 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 		// OR condition handling
 		if r.Or {
 			if r.OrValsFunc != nil {
-				r.OrVals = r.OrValsFunc()
+				r.orVals = r.OrValsFunc()
 			}
 			var expr []string
 			for i, key := range r.OrKeys {
-				if or := buildExpr(cond, key, r.OrOps[i], r.OrVals[i]); or != "" {
+				if or := buildExpr(cond, key, r.OrOps[i], r.orVals[i]); or != "" {
 					expr = append(expr, or)
 				}
 			}
@@ -124,9 +124,9 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 		} else {
 			// Non-OR condition handling
 			if r.ValFunc != nil {
-				r.Val = r.ValFunc()
+				r.val = r.ValFunc()
 			}
-			if expr := buildExpr(cond, r.Key, r.Op, r.Val); expr != "" {
+			if expr := buildExpr(cond, r.Key, r.Op, r.val); expr != "" {
 				clause.AddWhereExpr(cond.Args, expr)
 			}
 		}
@@ -144,19 +144,19 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 			continue
 		}
 		if r.ValFunc != nil {
-			r.Val = r.ValFunc()
+			r.val = r.ValFunc()
 		}
 		switch r.Op {
 		case Limit:
-			builder.Limit(cast.ToInt(r.Val))
+			builder.Limit(cast.ToInt(r.val))
 		case Offset:
-			builder.Offset(cast.ToInt(r.Val))
+			builder.Offset(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convert.ReflectSlice(r.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.Val))...)
+			if len(convert.ReflectSlice(r.val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.val))...)
 			}
 		case FindINSet:
-			builder.Where(fmt.Sprintf("FIND_IN_SET(%s, %s)", builder.Var(r.Val), builder.Var(r.Key)))
+			builder.Where(fmt.Sprintf("FIND_IN_SET(%s, %s)", builder.Var(r.val), builder.Var(r.Key)))
 		}
 	}
 
@@ -177,14 +177,14 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBu
 			continue
 		}
 		if r.ValFunc != nil {
-			r.Val = r.ValFunc()
+			r.val = r.ValFunc()
 		}
 		switch r.Op {
 		case Limit:
-			builder.Limit(cast.ToInt(r.Val))
+			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convert.ReflectSlice(r.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.Val))...)
+			if len(convert.ReflectSlice(r.val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.val))...)
 			}
 		}
 	}
@@ -205,14 +205,14 @@ func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBu
 			continue
 		}
 		if r.ValFunc != nil {
-			r.Val = r.ValFunc()
+			r.val = r.ValFunc()
 		}
 		switch r.Op {
 		case Limit:
-			builder.Limit(cast.ToInt(r.Val))
+			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convert.ReflectSlice(r.Val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.Val))...)
+			if len(convert.ReflectSlice(r.val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.val))...)
 			}
 		}
 	}

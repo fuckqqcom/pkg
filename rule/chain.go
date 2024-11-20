@@ -67,11 +67,11 @@ func (c Chain) add(field string, op Op, val any, opts ...opt.Opt[ChainOptions]) 
 	c.rules = append(c.rules, Rule{
 		Key:        field,
 		Op:         op,
-		Val:        val,
+		val:        val,
 		skip:       o.skip,
 		SkipFunc:   o.SkipFunc,
 		ValFunc:    o.ValFunc,
-		OrVals:     o.orVals,
+		orVals:     o.orVals,
 		OrValsFunc: o.OrValsFunc,
 	})
 	return c
@@ -125,10 +125,12 @@ func (c Chain) Or(fields []string, values []any, opts ...opt.Opt[ChainOptions]) 
 	o := opt.Bind(opts...)
 	c.rules = append(c.rules, Rule{
 		Or:         true,
+		val:        o.val,
 		OrKeys:     fields,
-		OrVals:     values,
 		skip:       o.skip,
 		SkipFunc:   o.SkipFunc,
+		ValFunc:    o.ValFunc,
+		orVals:     o.orVals,
 		OrValsFunc: o.OrValsFunc,
 	})
 	return c
