@@ -7,7 +7,7 @@ import (
 
 // Field 结构体定义
 type Field struct {
-	Key      string
+	key      string
 	val      any
 	skipFunc func() bool
 	valFunc  func() any
@@ -21,7 +21,7 @@ func NewField() *Field {
 
 // SetVal 设置 Field 的值，并接受可选的配置参数 opts，用于定制化行为
 func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
-	f.Key = key
+	f.key = key
 	f.val = val
 
 	// 应用所有传入的配置选项
@@ -31,7 +31,7 @@ func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
 
 	// 如果有 node 字段，继续设置下一个 Field
 	if f.node != nil {
-		return f.node.SetVal(f.node.Key, f.node.val, opts...)
+		return f.node.SetVal(f.node.key, f.node.val, opts...)
 	}
 
 	// 如果没有 node 字段，自动通过 next 创建下一个 Field
@@ -72,11 +72,11 @@ func (f *Field) Bind(obj any) (errs []error) {
 		}
 
 		// 通过反射获取目标对象中对应的字段
-		val := vals.FieldByName(field.Key)
+		val := vals.FieldByName(field.key)
 
 		// 如果字段无效，返回错误
 		if !val.IsValid() {
-			errs = append(errs, fmt.Errorf("field %s not found", field.Key))
+			errs = append(errs, fmt.Errorf("field %s not found", field.key))
 			continue
 		}
 
