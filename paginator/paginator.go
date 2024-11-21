@@ -1,6 +1,12 @@
 package paginator
 
-func Paginator(pageNum, pageSize int64) (int64, int64, int64) {
+func Paginator(pageNum, pageSize int64, isLimit bool) (int64, int64, int64) {
+	/*
+		isLimit:true表示不限制分页参数
+	*/
+	if isLimit {
+		return pageNum, pageSize, pageSize
+	}
 	if pageNum <= 0 {
 		pageNum = 1
 	}
