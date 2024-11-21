@@ -38,18 +38,18 @@ func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
 	f.next() // 自动创建链条中的下一个 Field
 
 	// 返回当前 Field 支持链式调用
-	return f
+	return f.node
 }
 
 // SkipFunc 设置 SkipFunc，决定是否跳过此字段
-func (f *Field) SkipFunc(skipFunc func() bool) Option {
+func SkipFunc(skipFunc func() bool) Option {
 	return func(f *Field) {
 		f.skipFunc = skipFunc
 	}
 }
 
 // ValFunc 设置 ValFunc，决定如何动态计算该字段的值
-func (f *Field) ValFunc(valFunc func() any) Option {
+func ValFunc(valFunc func() any) Option {
 	return func(f *Field) {
 		f.valFunc = valFunc
 	}

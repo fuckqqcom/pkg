@@ -30,18 +30,19 @@ func TestField_ApplyTo(t *testing.T) {
 	}
 	p := &Person{Age: 60}
 	f := NewField()
-	f.SetVal("Name", "John", f.SkipFunc(func() bool {
-		return false
+	f.SetVal("Name", "John", SkipFunc(func() bool {
+		return true
 	})).
 		SetVal("Email", "john@example.com",
-			f.SkipFunc(func() bool {
+			SkipFunc(func() bool {
 				return false
 			}),
-			f.ValFunc(func() any {
+			ValFunc(func() any {
 				return "new-email@example.com"
 			}),
 		)
 	f.Bind(p)
+	//{ John 60 new-email@example.com}，
 	fmt.Println(p)
 
 }
