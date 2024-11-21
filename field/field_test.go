@@ -24,23 +24,31 @@ func TestCropModel(t *testing.T) {
 
 func TestField_ApplyTo(t *testing.T) {
 	type Person struct {
-		Name  string
-		Age   int
-		Email string
+		Name        string
+		Age         int
+		Email       string
+		PhoneNumber string
 	}
 	p := &Person{Age: 60}
 	f := NewField()
-	f.SetVal("Name", "John", SkipFunc(func() bool {
-		return true
+	f.SetVal("name", "John", SkipFunc(func() bool {
+		return false
 	})).
-		SetVal("Email", "john@example.com",
+		SetVal("email", "john@example.com",
 			SkipFunc(func() bool {
 				return false
 			}),
 			ValFunc(func() any {
 				return "new-email@example.com"
 			}),
-		)
+		).SetVal("phoneNumber", "1190",
+		SkipFunc(func() bool {
+			return false
+		}),
+		ValFunc(func() any {
+			return "1190"
+		}),
+	)
 	f.Bind(p)
 	//{ John 60 new-email@example.com}，
 	fmt.Println(p)

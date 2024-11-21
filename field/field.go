@@ -2,6 +2,7 @@ package field
 
 import (
 	"fmt"
+	"github.com/ettle/strcase"
 	"reflect"
 )
 
@@ -21,7 +22,8 @@ func NewField() *Field {
 
 // SetVal 设置 Field 的值，并接受可选的配置参数 opts，用于定制化行为
 func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
-	f.key = key
+
+	f.key = strcase.ToPascal(key)
 	f.val = val
 
 	// 应用所有传入的配置选项
