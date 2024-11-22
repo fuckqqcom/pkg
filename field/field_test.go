@@ -64,7 +64,7 @@ func TestField_ApplyTo2(t *testing.T) {
 	}
 	p := &Person{Age: 60}
 	check := NewField().SetVal("name", "John", SkipFunc(func() bool {
-		return true
+		return false
 	})).
 		SetVal("email", "john@example.com",
 			SkipFunc(func() bool {
@@ -80,7 +80,7 @@ func TestField_ApplyTo2(t *testing.T) {
 		ValFunc(func() any {
 			return "1190"
 		}),
-	).Bind(p).Check()
+	).SetIgnoreKey([]string{"name"}).Bind(p).Check()
 	//{ John 60 new-email@example.com}，
 	fmt.Println(p)
 	fmt.Println(check)

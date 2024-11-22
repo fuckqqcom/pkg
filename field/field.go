@@ -11,16 +11,16 @@ type Field struct {
 	val        any
 	skipFunc   func() bool
 	valFunc    func() any
-	nodes      []*Field // 改为切片存储节点，以支持链式调用
-	keys       []string //存储所有处理的key
-	shipKeys   []string //存储跳过的key
-	ignoreKeys []string //
+	nodes      []*Field        // 改为切片存储节点，以支持链式调用
+	keys       []string        //存储所有处理的key
+	shipKeys   []string        //存储跳过的key
+	ignoreKeys map[string]bool //
 	errs       []error
 }
 
 // NewField 创建新的 Field 实例
 func NewField() *Field {
-	return &Field{}
+	return &Field{ignoreKeys: make(map[string]bool)}
 }
 
 // SetVal 设置 Field 的值，并接受可选的配置参数 opts，用于定制化行为
@@ -56,8 +56,10 @@ func ValFunc(valFunc func() any) Option {
 	}
 }
 
-func (f *Field) IgnoreKey(key []string) *Field {
-	f.ignoreKeys = key
+func (f *Field) SetIgnoreKey(keys []string) *Field {
+	for _, key := range keys {
+		f.ignoreKeys[strcase.ToPascal(key)] = true
+	}
 	return f
 }
 
@@ -72,7 +74,9 @@ func (f *Field) Bind(obj any) *Field {
 			f.shipKeys = append(f.shipKeys, field.key)
 			continue
 		}
-
+		if f.ignoreKeys[field.key] {
+			continue
+		}
 		// 如果 ValFunc 存在，则通过它计算字段的值
 		if field.valFunc != nil {
 			field.val = field.valFunc()
@@ -96,26 +100,26 @@ func (f *Field) Bind(obj any) *Field {
 	return f
 }
 
-// Check 检查要忽略的key等信息
+// Check 检查要忽略的key等信息 返回true表示没有要执行的更新操作的字段
 func (f *Field) Check() bool {
-	excludeMap := make(map[string]bool)
+
+	excludeField := make(map[string]bool)
 	// 将 shipKeys 和 ignoreKey 中的元素添加到排除列表
 	for _, key := range f.shipKeys {
-		excludeMap[key] = true
+		excludeField[key] = true
 	}
-	for _, key := range f.ignoreKeys {
-		excludeMap[key] = true
+	for key := range f.ignoreKeys {
+		excludeField[key] = true
 	}
-
 	// 创建一个新的切片存储计算结果
 	var result []string
 	for _, key := range f.keys {
-		if !excludeMap[key] {
+		if !excludeField[key] {
 			result = append(result, key)
+			break
 		}
 	}
-	// 返回一个布尔值，表示是否有有效的 key
-	return len(result) > 0
+	return len(result) == 0
 }
 
 // Option 类型用于对 Field 进行配置
