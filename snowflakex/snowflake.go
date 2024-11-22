@@ -1,4 +1,4 @@
-package snowflake
+package snowflakex
 
 import "github.com/bwmarrin/snowflake"
 

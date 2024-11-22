@@ -1,4 +1,4 @@
-package opt
+package optx
 
 // https://github.com/eddieowens/opts/blob/main/opts.go 源码出处
 

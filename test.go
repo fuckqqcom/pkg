@@ -1,250 +1,128 @@
 package main
 
-// import (
-//
-//	"fmt"
-//	"github.com/fuckqqcom/pkg/convert"
-//	"github.com/huandu/go-sqlbuilder"
-//	"github.com/spf13/cast"
-//
-// )
-type Op string
-
-func (o Op) String() string {
-	return string(o)
-}
-
-const (
-	E       Op = "="
-	NE      Op = "!="
-	GT      Op = ">"
-	LT      Op = "<"
-	GTE     Op = ">="
-	LTE     Op = "<="
-	In      Op = "IN"
-	NotIn   Op = "NOT IN"
-	Like    Op = "LIKE"
-	NotLike Op = "NOT LIKE"
-	Limit   Op = "LIMIT"
-	Offset  Op = "OFFSET"
-	Between Op = "BETWEEN"
-	OrderBy Op = "ORDER BY"
+import (
+	"fmt"
+	"github.com/ettle/strcase"
+	"reflect"
 )
 
-type Rule struct {
-	Key string
-
-	Skip     bool
-	SkipFunc func() bool
-
-	// Or condition
-	Or         bool
-	OrOps      []Op
-	OrKeys     []string
-	OrVals     []any
-	OrValsFunc func() []any
-
-	// And condition
-	Op      Op
-	Val     any
-	ValFunc func() any
+// Field 结构体定义
+type Field struct {
+	key      string
+	val      any
+	skipFunc func() bool
+	valFunc  func() any
+	nodes    []*Field // 改为切片存储节点，以支持链式调用
 }
 
-func New(rules ...Rule) []Rule {
-	return rules
+// NewField 创建新的 Field 实例
+func NewField() *Field {
+	return &Field{}
 }
 
-//
-//// buildCondition 构建单一条件表达式
-//func buildCondition(cond *sqlbuilder.Cond, key string, op Op, value any) string {
-//	switch op {
-//	case E:
-//		return cond.Equal(key, value)
-//	case NE:
-//		return cond.NotEqual(key, value)
-//	case GT:
-//		return cond.GreaterThan(key, value)
-//	case LT:
-//		return cond.LessThan(key, value)
-//	case GTE:
-//		return cond.GreaterEqualThan(key, value)
-//	case LTE:
-//		return cond.LessEqualThan(key, value)
-//	case In:
-//		return cond.In(key, convert.ReflectSlice(value)...) // 使用 convert.ReflectSlice 替代 castx.ToSlice
-//	case NotIn:
-//		return cond.NotIn(key, convert.ReflectSlice(value)...) // 使用 convert.ReflectSlice 替代 castx.ToSlice
-//	case Like:
-//		return cond.Like(key, value)
-//	case NotLike:
-//		return cond.NotLike(key, value)
-//	case Between:
-//		valueSlice := convert.ReflectSlice(value) // 使用 convert.ReflectSlice 替代 castx.ToSlice
-//		if len(valueSlice) == 2 {
-//			return cond.Between(key, valueSlice[0], valueSlice[1])
-//		}
-//	}
-//	return ""
-//}
-//
-//// processConditions 处理规则条件，将 Or 和 And 条件拼接
-//func processConditions(conditions []Rule, cond *sqlbuilder.Cond) []string {
-//	var exprs []string
-//	for _, c := range conditions {
-//		if c.SkipFunc != nil && c.SkipFunc() {
-//			continue
-//		}
-//
-//		// 处理 Or 条件
-//		if c.Or {
-//			// 如果存在 OrValsFunc，更新 OrVals
-//			if c.OrValsFunc != nil {
-//				c.OrVals = c.OrValsFunc()
-//			}
-//
-//			// 对于 Or 条件，构建每个字段与值的条件，并用 OR 拼接
-//			var orExprs []string
-//			for i, field := range c.OrKeys {
-//				// 使用对应的操作符处理每个字段
-//				expr := buildCondition(cond, field, c.OrOps[i], c.OrVals[i])
-//				if expr != "" {
-//					orExprs = append(orExprs, expr)
-//				}
-//			}
-//
-//			// 只在 OrExprs 不为空时加入
-//			if len(orExprs) > 0 {
-//				// 使用 cond.Or(exprs...) 来自动处理 OR 条件的拼接
-//				// sqlbuilder 会自动添加括号
-//				cond.Or(orExprs...) // 不再使用额外的括号拼接
-//			}
-//		} else {
-//			// 处理 And 条件
-//			if c.ValFunc != nil {
-//				c.Val = c.ValFunc()
-//			}
-//			expr := buildCondition(cond, c.Key, c.Op, c.Val)
-//			if expr != "" {
-//				exprs = append(exprs, expr)
-//			}
-//		}
-//	}
-//	return exprs
-//}
-//
-//// buildWhereClause 构建 SQL where 子句
-//func buildWhereClause(conditions ...Rule) *sqlbuilder.WhereClause {
-//	clause := sqlbuilder.NewWhereClause()
-//	cond := sqlbuilder.NewCond()
-//
-//	exprs := processConditions(conditions, cond)
-//	if len(exprs) > 0 {
-//		// 使用 AND 拼接各个条件
-//		clause.AddWhereExpr(cond.Args, cond.And(exprs...))
-//	}
-//
-//	return clause
-//}
-//
-//// ApplySelect 应用 SELECT 查询条件
-//func ApplySelect(sb *sqlbuilder.SelectBuilder, conditions ...Rule) {
-//	clause := buildWhereClause(conditions...)
-//	for _, c := range conditions {
-//		if c.SkipFunc != nil && c.SkipFunc() {
-//			continue
-//		}
-//		if c.ValFunc != nil {
-//			c.Val = c.ValFunc()
-//		}
-//		switch c.Op {
-//		case Limit:
-//			sb.Limit(cast.ToInt(c.Val))
-//		case Offset:
-//			sb.Offset(cast.ToInt(c.Val))
-//		case OrderBy:
-//			if len(convert.ReflectSlice(c.Val)) > 0 {
-//				sb.OrderBy(cast.ToStringSlice(convert.ReflectSlice(c.Val))...)
-//			}
-//		}
-//	}
-//	if clause != nil {
-//		sb = sb.AddWhereClause(clause)
-//	}
-//}
-//
-//// ApplyUpdate 应用 UPDATE 查询条件
-//func ApplyUpdate(sb *sqlbuilder.UpdateBuilder, conditions ...Rule) {
-//	clause := buildWhereClause(conditions...)
-//	for _, c := range conditions {
-//		if c.SkipFunc != nil && c.SkipFunc() {
-//			continue
-//		}
-//		if c.ValFunc != nil {
-//			c.Val = c.ValFunc()
-//		}
-//		switch c.Op {
-//		case Limit:
-//			sb.Limit(cast.ToInt(c.Val))
-//		case OrderBy:
-//			if len(convert.ReflectSlice(c.Val)) > 0 {
-//				sb.OrderBy(cast.ToStringSlice(convert.ReflectSlice(c.Val))...)
-//			}
-//		}
-//	}
-//	if clause != nil {
-//		sb = sb.AddWhereClause(clause)
-//	}
-//}
-//
-//func main() {
-//	sqlbuilder.DefaultFlavor = sqlbuilder.MySQL
-//
-//	//var values []any
-//	//values = append(values, []int{24, 48}, []int{170, 175})
-//	//
-//	//cds := New(Rule{
-//	//	Key: "name",
-//	//	Op:  E,
-//	//	Val: "jaronnie",
-//	//}, Rule{
-//	//	Or:     true,
-//	//	OrKeys: []string{"age", "height"},
-//	//	OrOps:  []Op{Between, Between},
-//	//	OrVals: values,
-//	//})
-//	//
-//	//sb := sqlbuilder.NewSelectBuilder().Select("name", "age", "height").From("user")
-//	//ApplySelect(sb, cds...)
-//	//
-//	//sql, args := sb.Build()
-//	//fmt.Println(sql)
-//	//fmt.Println(args)
-//
-//	var values []any
-//	values = append(values, []int{24, 48}, []int{170, 175})
-//	cds := New(Rule{
-//		SkipFunc: func() bool {
-//			return true
-//		},
-//		Key: "name",
-//		Op:  E,
-//		Val: "jaronnie",
-//		ValFunc: func() any {
-//			return "jaronnie2"
-//		},
-//	}, Rule{
-//		Or:     true,
-//		OrKeys: []string{"age", "height"},
-//		OrOps:  []Op{Between, Between},
-//		OrVals: values,
-//		OrValsFunc: func() []any {
-//			return []any{[]int{24, 49}, []int{170, 176}}
-//		},
-//	})
-//	clause := buildWhereClause(cds...)
-//
-//	fmt.Println(clause)
-//	statement, args := clause.Build()
-//	fmt.Println(statement)
-//	fmt.Println(args)
-//}
+// SetVal 设置 Field 的值，并接受可选的配置参数 optx，用于定制化行为
+func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
+	f.key = strcase.ToPascal(key) // 将 key 转换为 PascalCase 格式
+	f.val = val
+
+	// 应用所有传入的配置选项
+	for _, opt := range opts {
+		opt(f)
+	}
+
+	// 如果有下一个字段，返回下一个 Field 实例
+	fmt.Println("f.nodes--->", f.nodes)
+	return f.next()
+}
+
+// next 方法用于返回下一个 Field 节点
+func (f *Field) next() *Field {
+	node := &Field{key: f.key, val: f.val, skipFunc: f.skipFunc, valFunc: f.valFunc}
+	f.nodes = append(f.nodes, node) // 添加到链表中
+	return f
+}
+
+// SkipFunc 设置 SkipFunc，决定是否跳过此字段
+func SkipFunc(skipFunc func() bool) Option {
+	return func(f *Field) {
+		f.skipFunc = skipFunc
+	}
+}
+
+// ValFunc 设置 ValFunc，决定如何动态计算该字段的值
+func ValFunc(valFunc func() any) Option {
+	return func(f *Field) {
+		f.valFunc = valFunc
+	}
+}
+
+// Bind 将 Field 应用到目标对象上，返回错误列表
+func (f *Field) Bind(obj any) (errs []error) {
+	vals := reflect.ValueOf(obj).Elem()
+
+	// 遍历当前 Field 链表，逐个处理
+	for _, field := range f.nodes {
+		// 如果 SkipFunc 返回 true，则跳过此字段
+		if field.skipFunc != nil && field.skipFunc() {
+			continue
+		}
+
+		// 如果 ValFunc 存在，则通过它计算字段的值
+		if field.valFunc != nil {
+			field.val = field.valFunc()
+		}
+
+		// 通过反射获取目标对象中对应的字段
+		val := vals.FieldByName(field.key)
+
+		// 如果字段无效，返回错误
+		if !val.IsValid() {
+			errs = append(errs, fmt.Errorf("fieldx %s not found", field.key))
+			continue
+		}
+
+		// 如果字段可设置，赋值
+		if val.CanSet() {
+			val.Set(reflect.ValueOf(field.val))
+		}
+	}
+
+	return
+}
+
+// Option 类型用于对 Field 进行配置
+type Option func(*Field)
+
+func main() {
+	type Person struct {
+		Name        string
+		Age         int
+		Email       string
+		PhoneNumber string
+	}
+
+	p := &Person{Age: 60}
+
+	// 链式调用 SetVal 和 Bind，注意 SkipFunc 和 ValFunc 的配置
+	NewField().SetVal("name", "John", SkipFunc(func() bool {
+		return true // 不跳过 Name 字段
+	})).
+		SetVal("email", "john@example.com",
+			SkipFunc(func() bool {
+				return true // 不跳过 Email 字段
+			}),
+			ValFunc(func() any {
+				return "new-email@example.com" // 通过 ValFunc 修改 Email 字段值
+			}),
+		).SetVal("phoneNumber", "1190",
+		SkipFunc(func() bool {
+			return true // 跳过 PhoneNumber 字段
+		}),
+		ValFunc(func() any {
+			return "1190" // 该字段不会被设置，因为跳过了
+		}),
+	).Bind(p)
+
+	// 输出结果: { John 60 new-email@example.com }
+	fmt.Println(p)
+}

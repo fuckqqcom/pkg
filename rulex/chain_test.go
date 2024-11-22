@@ -1,4 +1,4 @@
-package rule
+package rulex
 
 import (
 	"fmt"

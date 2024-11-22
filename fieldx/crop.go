@@ -1,8 +1,8 @@
-package field
+package fieldx
 
 import (
 	"fmt"
-	"github.com/fuckqqcom/pkg/convert"
+	"github.com/fuckqqcom/pkg/convertx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"reflect"
@@ -16,7 +16,7 @@ func FilterProtoField(obj proto.Message, includeFields []string, excludeFields [
 	*/
 	fieldMap := map[string]bool{}
 	for _, v := range includeFields {
-		if !convert.ContainIgnoreCase(v, excludeFields) {
+		if !convertx.ContainIgnoreCase(v, excludeFields) {
 			fieldMap[v] = false
 		}
 	}
@@ -34,7 +34,7 @@ func FilterProtoField(obj proto.Message, includeFields []string, excludeFields [
 	fieldsAttrs := obj.ProtoReflect().Descriptor().Fields()
 	for i := 0; i < fieldsAttrs.Len(); i++ {
 		name := fieldsAttrs.Get(i).TextName()
-		if merge && !convert.ContainIgnoreCase(name, excludeFields) {
+		if merge && !convertx.ContainIgnoreCase(name, excludeFields) {
 			fieldMap[name] = true
 			continue
 		}
@@ -53,7 +53,7 @@ func FilterProtoField(obj proto.Message, includeFields []string, excludeFields [
 
 	data := make(map[string]any)
 	for field, _ := range fieldMap {
-		data[field] = convert.AnyToStr(obj.ProtoReflect().Get(fieldsAttrs.ByName(protoreflect.Name(field))).Interface())
+		data[field] = convertx.AnyToStr(obj.ProtoReflect().Get(fieldsAttrs.ByName(protoreflect.Name(field))).Interface())
 	}
 	return data
 }

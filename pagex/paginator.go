@@ -1,4 +1,4 @@
-package paginator
+package pagex
 
 func Paginator(pageNum, pageSize int64, isLimit bool) (int64, int64, int64) {
 	/*

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/fuckqqcom/pkg/constant"
-	"github.com/fuckqqcom/pkg/convert"
+	"github.com/fuckqqcom/pkg/convertx"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -12,7 +12,7 @@ import (
 func ExtractedUserInfo(ctx context.Context) (*UserInfo, error) {
 	val := GetValFromCtx(ctx, constant.UserInfo)
 	var user *UserInfo
-	bytes, err := convert.ToBytes(val)
+	bytes, err := convertx.ToBytes(val)
 	if err != nil {
 		return nil, err
 	}

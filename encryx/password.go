@@ -1,4 +1,4 @@
-package encry
+package encryx
 
 import (
 	"golang.org/x/crypto/bcrypt"

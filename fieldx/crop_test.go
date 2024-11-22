@@ -1,4 +1,4 @@
-package field
+package fieldx
 
 import (
 	"fmt"
@@ -67,7 +67,7 @@ func TestFilterProtoFields(t *testing.T) {
 			},
 		},
 		{
-			name:          "Test with includeFields and excludeFields, merge = true and field in both",
+			name:          "Test with includeFields and excludeFields, merge = true and fieldx in both",
 			includeFields: []string{"ID", "Name", "Age"},
 			excludeFields: []string{"Age", "Email"},
 			merge:         true,

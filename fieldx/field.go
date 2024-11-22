@@ -1,4 +1,4 @@
-package field
+package fieldx
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ func NewField() *Field {
 	return &Field{ignoreKeys: make(map[string]bool)}
 }
 
-// SetVal 设置 Field 的值，并接受可选的配置参数 opts，用于定制化行为
+// SetVal 设置 Field 的值，并接受可选的配置参数 optx，用于定制化行为
 func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
 	f.key = strcase.ToPascal(key) // 将 key 转换为 PascalCase 格式
 	f.val = val
@@ -87,7 +87,7 @@ func (f *Field) Bind(obj any) *Field {
 
 		// 如果字段无效，返回错误
 		if !val.IsValid() {
-			f.errs = append(f.errs, fmt.Errorf("field %s not found", field.key))
+			f.errs = append(f.errs, fmt.Errorf("fieldx %s not found", field.key))
 			continue
 		}
 

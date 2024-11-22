@@ -1,4 +1,4 @@
-package rule
+package rulex
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func TestSelect(t *testing.T) {
 	},
 		Rule{
 			Key: "name",
-			Op:  FindINSet,
+			Op:  FindInSet,
 			val: "jaronnie",
 		},
 		Rule{

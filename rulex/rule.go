@@ -1,8 +1,8 @@
-package rule
+package rulex
 
 import (
 	"fmt"
-	"github.com/fuckqqcom/pkg/convert"
+	"github.com/fuckqqcom/pkg/convertx"
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/spf13/cast"
 )
@@ -74,19 +74,19 @@ func buildExpr(cond *sqlbuilder.Cond, key string, operator Op, value any) string
 	case LTE:
 		return cond.LessEqualThan(key, value)
 	case In:
-		if len(convert.ReflectSlice(value)) > 0 {
-			return cond.In(key, convert.ReflectSlice(value)...)
+		if len(convertx.ReflectSlice(value)) > 0 {
+			return cond.In(key, convertx.ReflectSlice(value)...)
 		}
 	case NotIn:
-		if len(convert.ReflectSlice(value)) > 0 {
-			return cond.NotIn(key, convert.ReflectSlice(value)...)
+		if len(convertx.ReflectSlice(value)) > 0 {
+			return cond.NotIn(key, convertx.ReflectSlice(value)...)
 		}
 	case Like:
 		return cond.Like(key, value)
 	case NotLike:
 		return cond.NotLike(key, value)
 	case Between:
-		values := convert.ReflectSlice(value)
+		values := convertx.ReflectSlice(value)
 		if len(values) == 2 {
 			return cond.Between(key, values[0], values[1])
 		}
@@ -152,8 +152,8 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 		case Offset:
 			builder.Offset(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convert.ReflectSlice(r.val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.val))...)
+			if len(convertx.ReflectSlice(r.val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
 			}
 		case FindInSet:
 			builder.Where(fmt.Sprintf("FIND_IN_SET(%s, %s)", builder.Var(r.val), builder.Var(r.Key)))
@@ -183,8 +183,8 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBu
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convert.ReflectSlice(r.val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.val))...)
+			if len(convertx.ReflectSlice(r.val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
 			}
 		}
 	}
@@ -211,8 +211,8 @@ func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBu
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convert.ReflectSlice(r.val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convert.ReflectSlice(r.val))...)
+			if len(convertx.ReflectSlice(r.val)) > 0 {
+				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
 			}
 		}
 	}
