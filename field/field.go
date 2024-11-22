@@ -7,11 +7,15 @@ import (
 )
 
 type Field struct {
-	key      string
-	val      any
-	skipFunc func() bool
-	valFunc  func() any
-	nodes    []*Field // 改为切片存储节点，以支持链式调用
+	key        string
+	val        any
+	skipFunc   func() bool
+	valFunc    func() any
+	nodes      []*Field // 改为切片存储节点，以支持链式调用
+	keys       []string //存储所有处理的key
+	shipKeys   []string //存储跳过的key
+	ignoreKeys []string //
+	errs       []error
 }
 
 // NewField 创建新的 Field 实例
@@ -23,7 +27,7 @@ func NewField() *Field {
 func (f *Field) SetVal(key string, val any, opts ...Option) *Field {
 	f.key = strcase.ToPascal(key) // 将 key 转换为 PascalCase 格式
 	f.val = val
-
+	f.keys = append(f.keys, f.key)
 	// 应用所有传入的配置选项
 	for _, opt := range opts {
 		opt(f)
@@ -52,14 +56,20 @@ func ValFunc(valFunc func() any) Option {
 	}
 }
 
+func (f *Field) IgnoreKey(key []string) *Field {
+	f.ignoreKeys = key
+	return f
+}
+
 // Bind 将 Field 应用到目标对象上，返回错误列表
-func (f *Field) Bind(obj any) (errs []error) {
+func (f *Field) Bind(obj any) *Field {
 	vals := reflect.ValueOf(obj).Elem()
 
 	// 遍历当前 Field 链表，逐个处理
 	for _, field := range f.nodes {
 		// 如果 SkipFunc 返回 true，则跳过此字段
 		if field.skipFunc != nil && field.skipFunc() {
+			f.shipKeys = append(f.shipKeys, field.key)
 			continue
 		}
 
@@ -73,7 +83,7 @@ func (f *Field) Bind(obj any) (errs []error) {
 
 		// 如果字段无效，返回错误
 		if !val.IsValid() {
-			errs = append(errs, fmt.Errorf("field %s not found", field.key))
+			f.errs = append(f.errs, fmt.Errorf("field %s not found", field.key))
 			continue
 		}
 
@@ -83,7 +93,29 @@ func (f *Field) Bind(obj any) (errs []error) {
 		}
 	}
 
-	return
+	return f
+}
+
+// Check 检查要忽略的key等信息
+func (f *Field) Check() bool {
+	excludeMap := make(map[string]bool)
+	// 将 shipKeys 和 ignoreKey 中的元素添加到排除列表
+	for _, key := range f.shipKeys {
+		excludeMap[key] = true
+	}
+	for _, key := range f.ignoreKeys {
+		excludeMap[key] = true
+	}
+
+	// 创建一个新的切片存储计算结果
+	var result []string
+	for _, key := range f.keys {
+		if !excludeMap[key] {
+			result = append(result, key)
+		}
+	}
+	// 返回一个布尔值，表示是否有有效的 key
+	return len(result) > 0
 }
 
 // Option 类型用于对 Field 进行配置
