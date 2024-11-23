@@ -64,16 +64,33 @@ type Rule struct {
 	Op      Op
 	val     any
 	ValFunc func() any
-
-	// Set
-	Set bool
 }
 
 func NewRule(rules ...Rule) []Rule {
 	return rules
 }
 
-func buildExpr(cond *sqlbuilder.Cond, key string, operator Op, value any) string {
+func buildUpdateExpr(builder *sqlbuilder.UpdateBuilder, key string, operator Op, value any) string {
+	switch operator {
+	case Incr:
+		return builder.Incr(key)
+	case Decr:
+		return builder.Decr(key)
+	case Assign:
+		return builder.Assign(key, value)
+	case Add:
+		return builder.Add(key, value)
+	case Sub:
+		return builder.Sub(key, value)
+	case Mul:
+		return builder.Mul(key, value)
+	case Div:
+		return builder.Div(key, value)
+	default:
+		return ""
+	}
+}
+func buildCondExpr(cond *sqlbuilder.Cond, key string, operator Op, value any) string {
 	switch operator {
 	case E:
 		return cond.Equal(key, value)
@@ -120,7 +137,6 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 		if r.skip {
 			continue
 		}
-
 		// OR condition handling
 		if r.Or {
 			if r.OrValsFunc != nil {
@@ -128,7 +144,7 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 			}
 			var expr []string
 			for i, key := range r.OrKeys {
-				if or := buildExpr(cond, key, r.OrOps[i], r.orVals[i]); or != "" {
+				if or := buildCondExpr(cond, key, r.OrOps[i], r.orVals[i]); or != "" {
 					expr = append(expr, or)
 				}
 			}
@@ -140,7 +156,7 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 			if r.ValFunc != nil {
 				r.val = r.ValFunc()
 			}
-			if expr := buildExpr(cond, r.Key, r.Op, r.val); expr != "" {
+			if expr := buildCondExpr(cond, r.Key, r.Op, r.val); expr != "" {
 				clause.AddWhereExpr(cond.Args, expr)
 			}
 		}
@@ -202,20 +218,10 @@ func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateB
 			if len(convertx.ReflectSlice(r.val)) > 0 {
 				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
 			}
-		case Incr:
-			expr = append(expr, builder.Incr(r.Key))
-		case Decr:
-			expr = append(expr, builder.Decr(r.Key))
-		case Assign:
-			expr = append(expr, builder.Assign(r.Key, r.val))
-		case Add:
-			expr = append(expr, builder.Add(r.Key, r.val))
-		case Sub:
-			expr = append(expr, builder.Sub(r.Key, r.val))
-		case Mul:
-			expr = append(expr, builder.Mul(r.Key, r.val))
-		case Div:
-			expr = append(expr, builder.Div(r.Key, r.val))
+		default:
+			if _expr := buildUpdateExpr(builder, r.Key, r.Op, r.val); _expr != "" {
+				expr = append(expr, _expr)
+			}
 		}
 	}
 	if expr != nil {
