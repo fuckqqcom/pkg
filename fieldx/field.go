@@ -42,15 +42,15 @@ func (f *Field) next() *Field {
 	return f
 }
 
-// SkipFunc 设置 SkipFunc，决定是否跳过此字段
-func SkipFunc(skipFunc func() bool) Option {
+// WithSkipFunc WithValFunc 设置 SkipFunc，决定是否跳过此字段
+func WithSkipFunc(skipFunc func() bool) Option {
 	return func(f *Field) {
 		f.skipFunc = skipFunc
 	}
 }
 
-// ValFunc 设置 ValFunc，决定如何动态计算该字段的值
-func ValFunc(valFunc func() any) Option {
+// WithValFunc 设置 ValFunc，决定如何动态计算该字段的值
+func WithValFunc(valFunc func() any) Option {
 	return func(f *Field) {
 		f.valFunc = valFunc
 	}
