@@ -196,7 +196,6 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 
 	return builder
 }
-
 func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
 	builder.Set(builder.Assign("1", 2))
 	var expr []string
@@ -230,7 +229,6 @@ func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateB
 	if clause != nil {
 		builder = builder.AddWhereClause(clause)
 	}
-
 	return *builder
 }
 
