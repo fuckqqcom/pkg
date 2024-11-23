@@ -164,7 +164,7 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 	return clause
 }
 
-func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
+func Select(builder *sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
@@ -191,13 +191,12 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 	}
 
 	if clause != nil {
-		builder = *builder.AddWhereClause(clause)
+		builder = builder.AddWhereClause(clause)
 	}
 
-	return builder
+	return *builder
 }
 func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
-	builder.Set(builder.Assign("1", 2))
 	var expr []string
 	clause := whereClause(rules...)
 	for _, r := range rules {
@@ -232,7 +231,7 @@ func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateB
 	return *builder
 }
 
-func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
+func Delete(builder *sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
@@ -254,7 +253,7 @@ func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBu
 		}
 	}
 	if clause != nil {
-		builder = *builder.AddWhereClause(clause)
+		builder = builder.AddWhereClause(clause)
 	}
-	return builder
+	return *builder
 }
