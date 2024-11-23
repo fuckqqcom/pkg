@@ -9,6 +9,10 @@ type Chain struct {
 	rules []Rule
 }
 
+func (c Chain) Rule() []Rule {
+	return c.rules
+}
+
 type ChainOptions struct {
 	skip     bool
 	SkipFunc func() bool
@@ -181,8 +185,4 @@ func (c Chain) SetMul(field string, value any, opts ...optx.Opt[ChainOptions]) C
 
 func (c Chain) SetDiv(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
 	return c.add(field, Div, value, opts...)
-}
-
-func (c Chain) Rule() []Rule {
-	return c.rules
 }
