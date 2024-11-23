@@ -121,33 +121,6 @@ func (c Chain) Between(field string, value any, opts ...optx.Opt[ChainOptions]) 
 	return c.add(field, Between, value, opts...)
 }
 
-func (c Chain) SetIncr(field string, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Incr, "", opts...)
-}
-
-func (c Chain) SetDecr(field string, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Decr, "", opts...)
-}
-
-func (c Chain) SetAssign(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Assign, value, opts...)
-}
-
-func (c Chain) SetAdd(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Add, value, opts...)
-}
-func (c Chain) SetSub(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Sub, value, opts...)
-}
-
-func (c Chain) SetMul(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Mul, value, opts...)
-}
-
-func (c Chain) SetDiv(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Div, value, opts...)
-}
-
 func (c Chain) Or(fields []string, values []any, opts ...optx.Opt[ChainOptions]) Chain {
 	o := optx.Bind(opts...)
 	c.rules = append(c.rules, Rule{
@@ -177,6 +150,37 @@ func (c Chain) Offset(value any, opts ...optx.Opt[ChainOptions]) Chain {
 
 func (c Chain) Page(page, pageSize int, opts ...optx.Opt[ChainOptions]) Chain {
 	return c.add("", Offset, (page-1)*pageSize, opts...).add("", Limit, pageSize, opts...)
+}
+
+/*
+	set操作
+*/
+
+func (c Chain) SetIncr(field string, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Incr, "", opts...)
+}
+
+func (c Chain) SetDecr(field string, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Decr, "", opts...)
+}
+
+func (c Chain) SetAssign(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Assign, value, opts...)
+}
+
+func (c Chain) SetAdd(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Add, value, opts...)
+}
+func (c Chain) SetSub(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Sub, value, opts...)
+}
+
+func (c Chain) SetMul(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Mul, value, opts...)
+}
+
+func (c Chain) SetDiv(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Div, value, opts...)
 }
 
 func (c Chain) Rule() []Rule {
