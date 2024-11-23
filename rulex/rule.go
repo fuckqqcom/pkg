@@ -19,6 +19,8 @@ func (o Op) String() string {
 }
 
 const (
+
+	// E select op
 	E         Op = "="
 	NE        Op = "!="
 	GT        Op = ">"
@@ -34,6 +36,15 @@ const (
 	Between   Op = "BETWEEN"
 	OrderBy   Op = "ORDER BY"
 	FindInSet Op = "FIND_IN_SET"
+
+	// Incr update
+	Incr   Op = "Incr"
+	Decr   Op = "Decr"
+	Assign Op = "Assign"
+	Add    Op = "Add"
+	Sub    Op = "Sub"
+	Mul    Op = "Mul"
+	Div    Op = "Div"
 )
 
 type Rule struct {
@@ -53,6 +64,9 @@ type Rule struct {
 	Op      Op
 	val     any
 	ValFunc func() any
+
+	// Set
+	Set bool
 }
 
 func NewRule(rules ...Rule) []Rule {
@@ -167,7 +181,9 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 	return builder
 }
 
-func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
+func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
+	builder.Set(builder.Assign("1", 2))
+	var expr []string
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
@@ -186,13 +202,30 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBu
 			if len(convertx.ReflectSlice(r.val)) > 0 {
 				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
 			}
+		case Incr:
+			expr = append(expr, builder.Incr(r.Key))
+		case Decr:
+			expr = append(expr, builder.Decr(r.Key))
+		case Assign:
+			expr = append(expr, builder.Assign(r.Key, r.val))
+		case Add:
+			expr = append(expr, builder.Add(r.Key, r.val))
+		case Sub:
+			expr = append(expr, builder.Sub(r.Key, r.val))
+		case Mul:
+			expr = append(expr, builder.Mul(r.Key, r.val))
+		case Div:
+			expr = append(expr, builder.Div(r.Key, r.val))
 		}
 	}
+	if expr != nil {
+		builder.Set(expr...)
+	}
 	if clause != nil {
-		builder = *builder.AddWhereClause(clause)
+		builder = builder.AddWhereClause(clause)
 	}
 
-	return builder
+	return *builder
 }
 
 func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {

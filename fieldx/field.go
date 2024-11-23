@@ -13,7 +13,7 @@ type Field struct {
 	valFunc    func() any
 	nodes      []*Field        // 改为切片存储节点，以支持链式调用
 	keys       []string        //存储所有处理的key
-	shipKeys   []string        //存储跳过的key
+	skipKeys   []string        //存储跳过的key
 	ignoreKeys map[string]bool //
 	errs       []error
 }
@@ -71,7 +71,7 @@ func (f *Field) Bind(obj any) *Field {
 	for _, field := range f.nodes {
 		// 如果 SkipFunc 返回 true，则跳过此字段
 		if field.skipFunc != nil && field.skipFunc() {
-			f.shipKeys = append(f.shipKeys, field.key)
+			f.skipKeys = append(f.skipKeys, field.key)
 			continue
 		}
 		if f.ignoreKeys[field.key] {
@@ -104,8 +104,8 @@ func (f *Field) Bind(obj any) *Field {
 func (f *Field) Check() bool {
 
 	excludeField := make(map[string]bool)
-	// 将 shipKeys 和 ignoreKey 中的元素添加到排除列表
-	for _, key := range f.shipKeys {
+	// 将 skipKeys 和 ignoreKey 中的元素添加到排除列表
+	for _, key := range f.skipKeys {
 		excludeField[key] = true
 	}
 	for key := range f.ignoreKeys {

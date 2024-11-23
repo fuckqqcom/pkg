@@ -7,7 +7,7 @@ import (
 )
 
 func TestSelect(t *testing.T) {
-	sb := sqlbuilder.NewSelectBuilder().Select("name", "age", "height").From("user")
+	sb := sqlbuilder.NewUpdateBuilder()
 	var values []any
 	values = append(values, []int{24, 48}, []int{170, 175})
 	cds := NewRule(Rule{
@@ -40,7 +40,7 @@ func TestSelect(t *testing.T) {
 		},
 	)
 
-	builder := Select(*sb, cds...)
+	builder := Update(sb, cds...)
 
 	statement, args := builder.Build()
 	fmt.Println(statement)
