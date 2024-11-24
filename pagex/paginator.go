@@ -1,7 +1,5 @@
 package pagex
 
-import "strings"
-
 func Paginator(pageNum, pageSize int64, isLimit bool) (int64, int64, int64) {
 	/*
 		isLimit:true表示不限制分页参数
@@ -19,9 +17,9 @@ func Paginator(pageNum, pageSize int64, isLimit bool) (int64, int64, int64) {
 	return pageNum, pageSize, (pageNum - 1) * pageSize
 }
 
-func OrderBy(orderBy ...string) string {
+func OrderBy(orderBy map[string]any) map[string]any {
 	if len(orderBy) == 0 {
-		return " created_time desc "
+		return map[string]any{"created_time": "desc"}
 	}
-	return strings.Join(orderBy, ",")
+	return orderBy
 }
