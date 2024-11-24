@@ -2,6 +2,7 @@ package rulex
 
 import (
 	"fmt"
+	"github.com/ettle/strcase"
 	"github.com/huandu/go-sqlbuilder"
 	"testing"
 )
@@ -9,13 +10,13 @@ import (
 func TestChain_ToRules(t *testing.T) {
 	sb := sqlbuilder.NewSelectBuilder().Select("name", "age").From("user")
 
-	chain := NewChain().
-		E("field1", "value1", WithSkip(true)).
+	chain := NewChain(strcase.ToSnake).
+		E("createTime", "value1", WithSkip(false)).
 		E("field2", "value2", WithValFunc(func() any {
 			return "100"
 		})).
-		OrderBy("create_time desc").
-		OrderBy("sort desc")
+		OrderBy("createTime", " desc").
+		OrderBy("sort", " desc")
 	s := Select(sb, chain.Rule()...)
 	sql, args := s.Build()
 	fmt.Println(sql, args)

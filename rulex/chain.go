@@ -2,11 +2,13 @@ package rulex
 
 //https://github.com/jzero-io/jzero-contrib/blob/main/condition/chain.go 源码出处
 import (
+	"github.com/ettle/strcase"
 	"github.com/fuckqqcom/pkg/optx"
 )
 
 type Chain struct {
-	rules []Rule
+	keyFunc func(string) string // 新增 KeyFunc 字段
+	rules   []Rule
 }
 
 func (c Chain) Rule() []Rule {
@@ -58,8 +60,14 @@ func WithOrValsFunc(orValsFunc func() []any) optx.Opt[ChainOptions] {
 	}
 }
 
-func NewChain() Chain {
-	return Chain{}
+func NewChain(fs ...func(string) string) Chain {
+	var keyFunc func(string) string
+	if len(fs) > 0 {
+		keyFunc = fs[0]
+	} else {
+		keyFunc = strcase.ToSnake
+	}
+	return Chain{keyFunc: keyFunc}
 }
 
 func NewChainRules(rules ...Rule) Chain {
@@ -69,7 +77,7 @@ func NewChainRules(rules ...Rule) Chain {
 func (c Chain) add(field string, op Op, val any, opts ...optx.Opt[ChainOptions]) Chain {
 	o := optx.Bind(opts...)
 	c.rules = append(c.rules, Rule{
-		Key:        field,
+		Key:        c.keyFunc(field),
 		Op:         op,
 		val:        val,
 		skip:       o.skip,
@@ -81,75 +89,79 @@ func (c Chain) add(field string, op Op, val any, opts ...optx.Opt[ChainOptions])
 	return c
 }
 
-func (c Chain) E(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, E, value, opts...)
+func (c Chain) E(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, E, val, opts...)
 }
 
-func (c Chain) NE(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, NE, value, opts...)
+func (c Chain) NE(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, NE, val, opts...)
 }
 
-func (c Chain) GT(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, GT, value, opts...)
+func (c Chain) GT(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, GT, val, opts...)
 }
 
-func (c Chain) LT(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, LT, value, opts...)
+func (c Chain) LT(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, LT, val, opts...)
 }
 
-func (c Chain) GTE(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, GTE, value, opts...)
+func (c Chain) GTE(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, GTE, val, opts...)
 }
 
-func (c Chain) LTE(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, LTE, value, opts...)
+func (c Chain) LTE(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, LTE, val, opts...)
 }
 
-func (c Chain) Like(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Like, value, opts...)
+func (c Chain) Like(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Like, val, opts...)
 }
 
-func (c Chain) NotLike(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, NotLike, value, opts...)
+func (c Chain) NotLike(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, NotLike, val, opts...)
 }
 
-func (c Chain) In(field string, values any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, In, values, opts...)
+func (c Chain) In(field string, vals any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, In, vals, opts...)
 }
 
-func (c Chain) NotIn(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, NotIn, value, opts...)
+func (c Chain) NotIn(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, NotIn, val, opts...)
 }
 
-func (c Chain) Between(field string, value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(field, Between, value, opts...)
+func (c Chain) Between(field string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(field, Between, val, opts...)
 }
 
-func (c Chain) Or(fields []string, values []any, opts ...optx.Opt[ChainOptions]) Chain {
+func (c Chain) Or(fields []string, vals []any, opts ...optx.Opt[ChainOptions]) Chain {
 	o := optx.Bind(opts...)
+	var keys []string
+	for _, field := range fields {
+		keys = append(keys, c.keyFunc(field))
+	}
 	c.rules = append(c.rules, Rule{
 		Or:         true,
 		val:        o.val,
-		OrKeys:     fields,
+		OrKeys:     keys,
 		skip:       o.skip,
 		SkipFunc:   o.SkipFunc,
 		ValFunc:    o.ValFunc,
-		orVals:     o.orVals,
+		orVals:     vals,
 		OrValsFunc: o.OrValsFunc,
 	})
 	return c
 }
 
-func (c Chain) OrderBy(value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add("", OrderBy, value, opts...)
+func (c Chain) OrderBy(key string, val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add(key, OrderBy, val, opts...)
 }
 
-func (c Chain) Limit(value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add("", Limit, value, opts...)
+func (c Chain) Limit(val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add("", Limit, val, opts...)
 }
 
-func (c Chain) Offset(value any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add("", Offset, value, opts...)
+func (c Chain) Offset(val any, opts ...optx.Opt[ChainOptions]) Chain {
+	return c.add("", Offset, val, opts...)
 }
 
 func (c Chain) Page(page, pageSize int, opts ...optx.Opt[ChainOptions]) Chain {
