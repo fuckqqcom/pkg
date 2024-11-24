@@ -8,10 +8,10 @@ import (
 
 type Chain struct {
 	keyFunc func(string) string // 新增 KeyFunc 字段
-	rules   []Rule
+	rules   []rule
 }
 
-func (c Chain) Rule() []Rule {
+func (c Chain) Rule() []rule {
 	return c.rules
 }
 
@@ -70,13 +70,13 @@ func NewChain(fs ...func(string) string) Chain {
 	return Chain{keyFunc: keyFunc}
 }
 
-func NewChainRules(rules ...Rule) Chain {
+func NewChainRules(rules ...rule) Chain {
 	return Chain{rules: rules}
 }
 
 func (c Chain) add(field string, op Op, val any, opts ...optx.Opt[ChainOptions]) Chain {
 	o := optx.Bind(opts...)
-	c.rules = append(c.rules, Rule{
+	c.rules = append(c.rules, rule{
 		Key:        c.keyFunc(field),
 		Op:         op,
 		val:        val,
@@ -135,25 +135,65 @@ func (c Chain) Between(field string, val any, opts ...optx.Opt[ChainOptions]) Ch
 
 func (c Chain) Or(fields []string, vals []any, opts ...optx.Opt[ChainOptions]) Chain {
 	o := optx.Bind(opts...)
+
+	if o.OrValsFunc != nil {
+		o.orVals = o.OrValsFunc()
+	}
+
 	var keys []string
 	for _, field := range fields {
 		keys = append(keys, c.keyFunc(field))
 	}
-	c.rules = append(c.rules, Rule{
+	c.rules = append(c.rules, rule{
 		Or:         true,
 		val:        o.val,
 		OrKeys:     keys,
 		skip:       o.skip,
 		SkipFunc:   o.SkipFunc,
 		ValFunc:    o.ValFunc,
-		orVals:     vals,
+		orVals:     o.orVals,
 		OrValsFunc: o.OrValsFunc,
 	})
 	return c
 }
 
-func (c Chain) OrderBy(key string, val any, opts ...optx.Opt[ChainOptions]) Chain {
-	return c.add(key, OrderBy, val, opts...)
+func (c Chain) OrderBy(val any, opts ...optx.Opt[ChainOptions]) Chain {
+	o := optx.Bind(opts...)
+	if o.ValFunc != nil {
+		val = o.ValFunc()
+	}
+	switch vals := val.(type) {
+	case map[string]any:
+		for k, v := range vals {
+			c.rules = append(c.rules, rule{
+				Key:      c.keyFunc(k),
+				Op:       OrderBy,
+				val:      v,
+				skip:     o.skip,
+				SkipFunc: o.SkipFunc,
+			})
+		}
+	case map[string]string:
+		for k, v := range vals {
+			c.rules = append(c.rules, rule{
+				Key:      c.keyFunc(k),
+				Op:       OrderBy,
+				val:      v,
+				skip:     o.skip,
+				SkipFunc: o.SkipFunc,
+			})
+		}
+	default:
+		c.rules = append(c.rules, rule{
+			Key:      c.keyFunc(""),
+			Op:       OrderBy,
+			val:      val,
+			skip:     o.skip,
+			SkipFunc: o.SkipFunc,
+		})
+		c.add("", OrderBy, val, opts...)
+	}
+	return c
 }
 
 func (c Chain) Limit(val any, opts ...optx.Opt[ChainOptions]) Chain {

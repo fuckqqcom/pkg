@@ -10,7 +10,7 @@ func TestSelect(t *testing.T) {
 	sb := sqlbuilder.NewUpdateBuilder()
 	var values []any
 	values = append(values, []int{24, 48}, []int{170, 175})
-	cds := NewRule(Rule{
+	cds := NewRule(rule{
 		SkipFunc: func() bool {
 			return true
 		},
@@ -20,7 +20,7 @@ func TestSelect(t *testing.T) {
 		ValFunc: func() any {
 			return "jaronnie2"
 		},
-	}, Rule{
+	}, rule{
 		Or:     true,
 		OrKeys: []string{"age", "height"},
 		OrOps:  []Op{Between, Between},
@@ -29,12 +29,12 @@ func TestSelect(t *testing.T) {
 			return []any{[]int{24, 49}, []int{170, 176}}
 		},
 	},
-		Rule{
+		rule{
 			Key: "name",
 			Op:  FindInSet,
 			val: "jaronnie",
 		},
-		Rule{
+		rule{
 			Op:  Limit,
 			val: 10,
 		},
