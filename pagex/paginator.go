@@ -17,9 +17,9 @@ func Paginator(pageNum, pageSize int64, isLimit bool) (int64, int64, int64) {
 	return pageNum, pageSize, (pageNum - 1) * pageSize
 }
 
-func OrderBy(orderBy map[string]any) map[string]any {
+func OrderBy(orderBy map[string]string) map[string]string {
 	if len(orderBy) == 0 {
-		return map[string]any{"created_time": "desc"}
+		return map[string]string{"created_time": "desc"}
 	}
 	return orderBy
 }
