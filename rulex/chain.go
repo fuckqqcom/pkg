@@ -8,10 +8,10 @@ import (
 
 type Chain struct {
 	keyFunc func(string) string // 新增 KeyFunc 字段
-	rules   []rule
+	rules   []Rule
 }
 
-func (c Chain) Rule() []rule {
+func (c Chain) Rule() []Rule {
 	return c.rules
 }
 
@@ -70,13 +70,13 @@ func NewChain(fs ...func(string) string) Chain {
 	return Chain{keyFunc: keyFunc}
 }
 
-func NewChainRules(rules ...rule) Chain {
+func NewChainRules(rules ...Rule) Chain {
 	return Chain{rules: rules}
 }
 
 func (c Chain) add(field string, op Op, val any, opts ...optx.Opt[ChainOptions]) Chain {
 	o := optx.Bind(opts...)
-	c.rules = append(c.rules, rule{
+	c.rules = append(c.rules, Rule{
 		Key:        c.keyFunc(field),
 		Op:         op,
 		val:        val,
@@ -144,7 +144,7 @@ func (c Chain) Or(fields []string, vals []any, opts ...optx.Opt[ChainOptions]) C
 	for _, field := range fields {
 		keys = append(keys, c.keyFunc(field))
 	}
-	c.rules = append(c.rules, rule{
+	c.rules = append(c.rules, Rule{
 		Or:         true,
 		val:        o.val,
 		OrKeys:     keys,
@@ -165,7 +165,7 @@ func (c Chain) OrderBy(val any, opts ...optx.Opt[ChainOptions]) Chain {
 	switch vals := val.(type) {
 	case map[string]any:
 		for k, v := range vals {
-			c.rules = append(c.rules, rule{
+			c.rules = append(c.rules, Rule{
 				Key:      c.keyFunc(k),
 				Op:       OrderBy,
 				val:      v,
@@ -175,7 +175,7 @@ func (c Chain) OrderBy(val any, opts ...optx.Opt[ChainOptions]) Chain {
 		}
 	case map[string]string:
 		for k, v := range vals {
-			c.rules = append(c.rules, rule{
+			c.rules = append(c.rules, Rule{
 				Key:      c.keyFunc(k),
 				Op:       OrderBy,
 				val:      v,
@@ -184,7 +184,7 @@ func (c Chain) OrderBy(val any, opts ...optx.Opt[ChainOptions]) Chain {
 			})
 		}
 	default:
-		c.rules = append(c.rules, rule{
+		c.rules = append(c.rules, Rule{
 			Key:      c.keyFunc(""),
 			Op:       OrderBy,
 			val:      val,

@@ -19,7 +19,7 @@ func TestChain_ToRules(t *testing.T) {
 	//sql, args := s.Build()
 	//fmt.Println(sql, args)
 	chain = chain.SetIncr("key1", WithSkipFunc(func() bool {
-		return true
+		return false
 	}))
 	builder := sqlbuilder.NewUpdateBuilder()
 	b := Update(builder, chain.Rule()...)

@@ -47,7 +47,7 @@ const (
 	Div    Op = "Div"
 )
 
-type rule struct {
+type Rule struct {
 	Key string
 
 	skip     bool
@@ -66,9 +66,9 @@ type rule struct {
 	ValFunc func() any
 }
 
-func NewRule(rules ...rule) []rule {
-	return rules
-}
+//func NewRule(rules ...Rule) []Rule {
+//	return rules
+//}
 
 func buildUpdateExpr(builder *sqlbuilder.UpdateBuilder, key string, operator Op, value any) string {
 	switch operator {
@@ -125,7 +125,7 @@ func buildCondExpr(cond *sqlbuilder.Cond, key string, operator Op, value any) st
 	return ""
 }
 
-func whereClause(rules ...rule) *sqlbuilder.WhereClause {
+func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 	clause := sqlbuilder.NewWhereClause()
 	cond := sqlbuilder.NewCond()
 
@@ -164,7 +164,7 @@ func whereClause(rules ...rule) *sqlbuilder.WhereClause {
 	return clause
 }
 
-func Select(builder *sqlbuilder.SelectBuilder, rules ...rule) sqlbuilder.SelectBuilder {
+func Select(builder *sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
@@ -192,7 +192,7 @@ func Select(builder *sqlbuilder.SelectBuilder, rules ...rule) sqlbuilder.SelectB
 
 	return *builder
 }
-func Update(builder *sqlbuilder.UpdateBuilder, rules ...rule) sqlbuilder.UpdateBuilder {
+func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
 	var expr []string
 	clause := whereClause(rules...)
 	for _, r := range rules {
@@ -222,7 +222,7 @@ func Update(builder *sqlbuilder.UpdateBuilder, rules ...rule) sqlbuilder.UpdateB
 	return *builder
 }
 
-func Delete(builder *sqlbuilder.DeleteBuilder, rules ...rule) sqlbuilder.DeleteBuilder {
+func Delete(builder *sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
