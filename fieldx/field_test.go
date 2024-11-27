@@ -31,21 +31,21 @@ func TestField_ApplyTo1(t *testing.T) {
 	}
 	p := &Person{Age: 60}
 	f := NewField()
-	f.SetVal("name", "John", SkipFunc(func() bool {
+	f.SetVal("name", "John", WithSkipFunc(func() bool {
 		return false
 	})).
 		SetVal("email", "john@example.com",
-			SkipFunc(func() bool {
+			WithSkipFunc(func() bool {
 				return false
 			}),
-			ValFunc(func() any {
+			WithValFunc(func() any {
 				return "new-email@example.com"
 			}),
 		).SetVal("phoneNumber", "1190",
-		SkipFunc(func() bool {
+		WithSkipFunc(func() bool {
 			return true
 		}),
-		ValFunc(func() any {
+		WithValFunc(func() any {
 			return "1190"
 		}),
 	)
@@ -63,21 +63,21 @@ func TestField_ApplyTo2(t *testing.T) {
 		PhoneNumber string
 	}
 	p := &Person{Age: 60}
-	check := NewField().SetVal("name", "John", SkipFunc(func() bool {
+	check := NewField().SetVal("name", "John", WithSkipFunc(func() bool {
 		return false
 	})).
 		SetVal("email", "john@example.com",
-			SkipFunc(func() bool {
+			WithSkipFunc(func() bool {
 				return true
 			}),
-			ValFunc(func() any {
+			WithValFunc(func() any {
 				return "new-email@example.com"
 			}),
 		).SetVal("phoneNumber", "1190",
-		SkipFunc(func() bool {
+		WithSkipFunc(func() bool {
 			return true
 		}),
-		ValFunc(func() any {
+		WithValFunc(func() any {
 			return "1190"
 		}),
 	).SetIgnoreKey([]string{"name"}).Bind(p).Check()

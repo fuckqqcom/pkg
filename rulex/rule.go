@@ -19,6 +19,8 @@ func (o Op) String() string {
 }
 
 const (
+
+	// E select op
 	E         Op = "="
 	NE        Op = "!="
 	GT        Op = ">"
@@ -34,6 +36,15 @@ const (
 	Between   Op = "BETWEEN"
 	OrderBy   Op = "ORDER BY"
 	FindInSet Op = "FIND_IN_SET"
+
+	// Incr update
+	Incr   Op = "Incr"
+	Decr   Op = "Decr"
+	Assign Op = "Assign"
+	Add    Op = "Add"
+	Sub    Op = "Sub"
+	Mul    Op = "Mul"
+	Div    Op = "Div"
 )
 
 type Rule struct {
@@ -55,11 +66,31 @@ type Rule struct {
 	ValFunc func() any
 }
 
-func NewRule(rules ...Rule) []Rule {
-	return rules
-}
+//func NewRule(rules ...Rule) []Rule {
+//	return rules
+//}
 
-func buildExpr(cond *sqlbuilder.Cond, key string, operator Op, value any) string {
+func buildUpdateExpr(builder *sqlbuilder.UpdateBuilder, key string, operator Op, value any) string {
+	switch operator {
+	case Incr:
+		return builder.Incr(key)
+	case Decr:
+		return builder.Decr(key)
+	case Assign:
+		return builder.Assign(key, value)
+	case Add:
+		return builder.Add(key, value)
+	case Sub:
+		return builder.Sub(key, value)
+	case Mul:
+		return builder.Mul(key, value)
+	case Div:
+		return builder.Div(key, value)
+	default:
+		return ""
+	}
+}
+func buildCondExpr(cond *sqlbuilder.Cond, key string, operator Op, value any) string {
 	switch operator {
 	case E:
 		return cond.Equal(key, value)
@@ -106,15 +137,14 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 		if r.skip {
 			continue
 		}
-
 		// OR condition handling
 		if r.Or {
-			if r.OrValsFunc != nil {
-				r.orVals = r.OrValsFunc()
-			}
+			//if r.OrValsFunc != nil {
+			//	r.orVals = r.OrValsFunc()
+			//}
 			var expr []string
 			for i, key := range r.OrKeys {
-				if or := buildExpr(cond, key, r.OrOps[i], r.orVals[i]); or != "" {
+				if or := buildCondExpr(cond, key, r.OrOps[i], r.orVals[i]); or != "" {
 					expr = append(expr, or)
 				}
 			}
@@ -123,10 +153,10 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 			}
 		} else {
 			// Non-OR condition handling
-			if r.ValFunc != nil {
-				r.val = r.ValFunc()
-			}
-			if expr := buildExpr(cond, r.Key, r.Op, r.val); expr != "" {
+			//if r.ValFunc != nil {
+			//	r.val = r.ValFunc()
+			//}
+			if expr := buildCondExpr(cond, r.Key, r.Op, r.val); expr != "" {
 				clause.AddWhereExpr(cond.Args, expr)
 			}
 		}
@@ -134,7 +164,7 @@ func whereClause(rules ...Rule) *sqlbuilder.WhereClause {
 	return clause
 }
 
-func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
+func Select(builder *sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBuilder {
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
@@ -143,31 +173,27 @@ func Select(builder sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectBu
 		if r.skip {
 			continue
 		}
-		if r.ValFunc != nil {
-			r.val = r.ValFunc()
-		}
+
 		switch r.Op {
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case Offset:
 			builder.Offset(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convertx.ReflectSlice(r.val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
-			}
+			builder.OrderBy(fmt.Sprintf("%s %s", r.Key, r.val))
 		case FindInSet:
 			builder.Where(fmt.Sprintf("FIND_IN_SET(%s, %s)", builder.Var(r.val), builder.Var(r.Key)))
 		}
 	}
 
 	if clause != nil {
-		builder = *builder.AddWhereClause(clause)
+		builder = builder.AddWhereClause(clause)
 	}
 
-	return builder
+	return *builder
 }
-
-func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
+func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBuilder {
+	var expr []string
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
@@ -176,26 +202,27 @@ func Update(builder sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateBu
 		if r.skip {
 			continue
 		}
-		if r.ValFunc != nil {
-			r.val = r.ValFunc()
-		}
 		switch r.Op {
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convertx.ReflectSlice(r.val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
+			builder.OrderBy(fmt.Sprintf("%s %s", r.Key, r.val))
+		default:
+			if _expr := buildUpdateExpr(builder, r.Key, r.Op, r.val); _expr != "" {
+				expr = append(expr, _expr)
 			}
 		}
 	}
-	if clause != nil {
-		builder = *builder.AddWhereClause(clause)
+	if expr != nil {
+		builder.Set(expr...)
 	}
-
-	return builder
+	if clause != nil {
+		builder = builder.AddWhereClause(clause)
+	}
+	return *builder
 }
 
-func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
+func Delete(builder *sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBuilder {
 	clause := whereClause(rules...)
 	for _, r := range rules {
 		if r.SkipFunc != nil {
@@ -204,20 +231,15 @@ func Delete(builder sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteBu
 		if r.skip {
 			continue
 		}
-		if r.ValFunc != nil {
-			r.val = r.ValFunc()
-		}
 		switch r.Op {
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			if len(convertx.ReflectSlice(r.val)) > 0 {
-				builder.OrderBy(cast.ToStringSlice(convertx.ReflectSlice(r.val))...)
-			}
+			builder.OrderBy(fmt.Sprintf("%s %s", r.Key, r.val))
 		}
 	}
 	if clause != nil {
-		builder = *builder.AddWhereClause(clause)
+		builder = builder.AddWhereClause(clause)
 	}
-	return builder
+	return *builder
 }
