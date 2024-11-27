@@ -121,16 +121,18 @@ func (c Chain) Between(field string, value any, opts ...optx.Opt[ChainOptions]) 
 	return c.add(field, Between, value, opts...)
 }
 
-func (c Chain) Or(fields []string, values []any, opts ...optx.Opt[ChainOptions]) Chain {
+// func (c Chain) Or(fields []string, values []any, opts ...optx.Opt[ChainOptions]) Chain {
+func (c Chain) Or(fields []string, ops []Op, vals []any, opts ...optx.Opt[ChainOptions]) Chain {
 	o := optx.Bind(opts...)
 	c.rules = append(c.rules, Rule{
 		Or:         true,
 		val:        o.val,
 		OrKeys:     fields,
+		OrOps:      ops,
 		skip:       o.skip,
 		SkipFunc:   o.SkipFunc,
 		ValFunc:    o.ValFunc,
-		orVals:     o.orVals,
+		orVals:     vals,
 		OrValsFunc: o.OrValsFunc,
 	})
 	return c
