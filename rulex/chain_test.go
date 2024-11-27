@@ -20,7 +20,7 @@ func TestChain_ToRules(t *testing.T) {
 	//fmt.Println(sql, args)
 	chain = chain.SetIncr("key1", WithSkipFunc(func() bool {
 		return false
-	}))
+	})).OrderBy("order desc ")
 	builder := sqlbuilder.NewUpdateBuilder()
 	b := Update(builder, chain.Rule()...)
 	sql, args := b.Build()

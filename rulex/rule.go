@@ -180,7 +180,7 @@ func Select(builder *sqlbuilder.SelectBuilder, rules ...Rule) sqlbuilder.SelectB
 		case Offset:
 			builder.Offset(cast.ToInt(r.val))
 		case OrderBy:
-			builder.OrderBy(fmt.Sprintf("%s %s", r.Key, r.val))
+			builder.OrderBy(r.val.(string))
 		case FindInSet:
 			builder.Where(fmt.Sprintf("FIND_IN_SET(%s, %s)", builder.Var(r.val), builder.Var(r.Key)))
 		}
@@ -206,7 +206,7 @@ func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateB
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			builder.OrderBy(fmt.Sprintf("%s %s", r.Key, r.val))
+			builder.OrderBy(r.val.(string))
 		default:
 			if _expr := buildUpdateExpr(builder, r.Key, r.Op, r.val); _expr != "" {
 				expr = append(expr, _expr)
@@ -235,7 +235,7 @@ func Delete(builder *sqlbuilder.DeleteBuilder, rules ...Rule) sqlbuilder.DeleteB
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			builder.OrderBy(fmt.Sprintf("%s %s", r.Key, r.val))
+			builder.OrderBy(r.val.(string))
 		}
 	}
 	if clause != nil {
