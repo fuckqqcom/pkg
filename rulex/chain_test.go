@@ -4,23 +4,20 @@ import (
 	"fmt"
 	"github.com/ettle/strcase"
 	"github.com/huandu/go-sqlbuilder"
+	"strings"
 	"testing"
 )
 
 func TestChain_ToRules(t *testing.T) {
 	//sb := sqlbuilder.NewSelectBuilder().Select("name", "age").From("user")
 
-	chain := NewChain(strcase.ToSnake).
-		//E("createTime", "value1", WithSkip(false)).
-		OrderBy(map[string]any{"createTime1": "desc"}, WithValFunc(func() any {
-			return map[string]any{"sort": "desc", "createTime": "desc"}
-		}))
+	chain := NewChain(strcase.ToSnake)
 	//s := Select(sb, chain.Rule()...)
 	//sql, args := s.Build()
 	//fmt.Println(sql, args)
 	chain = chain.SetIncr("key1", WithSkipFunc(func() bool {
 		return false
-	})).OrderBy("order desc ")
+	})).OrderBy(strings.Join([]string{"order desc ", "a desc"}, ","))
 	builder := sqlbuilder.NewUpdateBuilder()
 	b := Update(builder, chain.Rule()...)
 	sql, args := b.Build()

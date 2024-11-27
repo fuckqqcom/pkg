@@ -66,10 +66,9 @@ type Rule struct {
 	ValFunc func() any
 }
 
-//func NewRule(rules ...Rule) []Rule {
-//	return rules
-//}
-
+//	func NewRule(rules ...Rule) []Rule {
+//		return rules
+//	}
 func buildUpdateExpr(builder *sqlbuilder.UpdateBuilder, key string, operator Op, value any) string {
 	switch operator {
 	case Incr:
@@ -206,7 +205,7 @@ func Update(builder *sqlbuilder.UpdateBuilder, rules ...Rule) sqlbuilder.UpdateB
 		case Limit:
 			builder.Limit(cast.ToInt(r.val))
 		case OrderBy:
-			builder.OrderBy(r.val.(string))
+			builder = builder.OrderBy(r.val.(string))
 		default:
 			if _expr := buildUpdateExpr(builder, r.Key, r.Op, r.val); _expr != "" {
 				expr = append(expr, _expr)
